@@ -34,12 +34,58 @@ class ida_sync(object):
         # open the IDA Sync database, creating it if it doesn't exist.
         self.db = db.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
         self.cursor = self.db.cursor()
-        
-        self.cursor.execute("CREATE TABLE IF NOT EXISTS projects (id int(5) auto_increment, name varchar(50), PRIMARY KEY (`id`))")
+
+        self.cursor.execute("SHOW TABLES LIKE \"projects\"")
+
+        if not self.cursor.fetchone():
+            self.cursor.execute("""
+                CREATE TABLE projects (
+                    `id` int(5) auto_increment,
+                    `name` varchar(50),
+                    PRIMARY KEY (`id`)
+                    
+                )""")
+
+            self.cursor.execute("""
+                CREATE TABLE records (
+                    `id` int(9) auto_increment,
+                    `project_id` int(5),
+                    `user_id` int(5),
+                    `teatime` timestamp,
+                    
+                    
+                    PRIMARY KEY (`id`),
+                    CONSTRAINT `projectid_to_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
+                    CONSTRAINT `userid_to_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
+
+                    )
+                
+                """)
         # if it doesn't already exist, define a view to track user updates.
         #description = "__last__[username:S,project:S,timestamp:L]"
-        #self.last_view = self.db.getas(description)
 
+    def last_view(self, username=None, project=None):
+
+        if not username:
+            username = self.username
+
+        if not project:
+            project = self.project
+
+        self.cursor.execute("""
+            SELECT *
+            FROM
+                records
+            LEFT JOIN
+                users ON users.id = records.user_id
+            WHERE
+                users.username = %s
+            AND
+                projects.name = %s
+            ORDER BY
+                id DESC
+            LIMIT 1""" % (username, project))
+        return self.cursor.fetchone()
 
     ############################################################################
     ### _init()
@@ -65,22 +111,20 @@ class ida_sync(object):
         self.password    = password
 
         # retrieve the project view.
-        self.proj_view = self.db.view(project)
+        #self.proj_view = self.db.view(project)
 
         # create an exception if the view doesn't exist.
-        if (str(self.proj_view.structure()) == "[]"):
+        if not self._findproject(self.project):
             raise serverx("requested project not found.")
 
-        self.db.commit()
-
         # determine the user's last update.
-        index = self.last_view.find(username=username, project=project)
+        index = self.last_view(username=username, project=project)
 
-        if (index != -1):
-            last = self.last_view[index].timestamp
+        if index:
+            last = index[3] #timestamp
 
             # refresh the last update record.
-            self.update_last(username, project)
+            self.update_last()
         else:
             last = 0
 
@@ -103,7 +147,7 @@ class ida_sync(object):
                 break
 
         # reset the last update time.
-        self.update_last(username, project)
+        self.update_last()
 
 
     def _findproject(self, project):
@@ -132,7 +176,6 @@ class ida_sync(object):
         self.cursor.execute("INSERT INTO projects VALUES(NULL, \"%s\")" % project)
         #self.db.getas(project + "[type:I,address:L,data:S,timestamp:L,user:S]")
         
-
 
     ############################################################################
     ### delete_row()
@@ -308,17 +351,16 @@ class ida_sync(object):
     ### raises:  none.
     ### returns: none.
     ###
-    def update_last(self, username, project):
-        index = self.last_view.find(username=username, project=project)
+    def update_last(self, username=None, project=None):
+
+        username = username or self.username
+        project = project or self.project
+
+        index = self.last_view(username, project)
 
         # if a last update entry already exists for this user, remove it.
-        if (index != -1):
-            self.last_view.delete(index)
+        if index:
+            self.delete_record(index)
 
         # create the last update entry.
-        self.last_view.append(username  = username,
-                              project   = project,
-                              timestamp = long(time.time()))
-
-        # commit the changes.
-        self.db.commit()
+        self.append_record( username=username, project=project, timestamp = long(time.time()))
