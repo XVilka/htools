@@ -16,12 +16,13 @@
 # Place, Suite 330, Boston, MA 02111-1307 USA
 
 import time
-import Mk4py as mk
+#import Mk4py as mk
+import MySQLdb as db
 
 from serverx          import *
 from server_constants import *
 
-class ida_sync:
+class ida_sync(object):
     ############################################################################
     ### constructor
     ###
@@ -31,11 +32,13 @@ class ida_sync:
     ###
     def __init__(self):
         # open the IDA Sync database, creating it if it doesn't exist.
-        self.db = mk.storage("databases/ida_sync.db", 1)
-
+        self.db = db.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
+        self.cursor = self.db.cursor()
+        
+        self.cursor.execute("CREATE TABLE IF NOT EXISTS projects (id int(5) auto_increment, name varchar(50), PRIMARY KEY (`id`))")
         # if it doesn't already exist, define a view to track user updates.
-        description = "__last__[username:S,project:S,timestamp:L]"
-        self.last_view = self.db.getas(description)
+        #description = "__last__[username:S,project:S,timestamp:L]"
+        #self.last_view = self.db.getas(description)
 
 
     ############################################################################
@@ -103,6 +106,18 @@ class ida_sync:
         self.update_last(username, project)
 
 
+    def _findproject(self, project):
+        if not project.isalpha():
+            raise serverx("project name can containts only alpha character")
+        
+        result = self.cursor.execute("SELECT * FROM projects WHERE name = \"%s\"" % project)
+        
+        if not result:
+            return None
+
+        return result
+
+
     ############################################################################
     ### create()
     ###
@@ -111,8 +126,12 @@ class ida_sync:
     ### returns: none.
     ###
     def create(self, project):
-        self.db.getas(project + "[type:I,address:L,data:S,timestamp:L,user:S]")
-        self.db.commit()
+        if self._findproject(project):
+            raise serverx("project '%s' already exists" % project)
+
+        self.cursor.execute("INSERT INTO projects VALUES(NULL, \"%s\")" % project)
+        #self.db.getas(project + "[type:I,address:L,data:S,timestamp:L,user:S]")
+        
 
 
     ############################################################################

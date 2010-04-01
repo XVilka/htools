@@ -1,4 +1,3 @@
-#!c:\python\python.exe
 #!/usr/bin/python
 
 # IDA Sync Server Command Line User Management Utility
@@ -59,7 +58,7 @@ elif (command == "list"):
     um = user_manager()
     
     for user in um.list():
-        print user.username + ", " + user.realname
+        print user[1] + ", " + user[3]
 
 elif (command == "validate"):
     password = getpass.getpass("password> ")

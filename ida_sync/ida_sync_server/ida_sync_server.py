@@ -1,4 +1,3 @@
-#!c:\python\python.exe
 #!/usr/bin/python
 
 # IDA Sync Server
@@ -63,6 +62,8 @@ while (1):
 
     console_log("[*] connection received from: %s:%d" \
              % (client_address[0], client_address[1]))
-
+    print client
+    print connections
+    
     connection = connection_thread(client, connections, log_to_console)
     connection.start()

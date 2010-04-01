@@ -29,7 +29,7 @@ sys.path.append("modules")
 
 # import any available modules.
 for file in os.listdir("modules"):
-    if (file.endswith(".py")):
+    if file.endswith(".py"):
         file = file.split(".")[0]
         exec("from " + file + " import *")
 

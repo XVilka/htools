@@ -29,3 +29,8 @@ class server_constants:
     PROJECT     = 2
     USERNAME    = 3
     TIMESTAMP   = 4
+
+DB_HOST = 'localhost'
+DB_USER = 'yed'
+DB_PASS = 'heslo'
+DB_NAME = 'ida'

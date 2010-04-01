@@ -1,4 +1,3 @@
-#!c:\python\python.exe
 #!/usr/bin/python
 
 # IDA Sync Server Command Line Database Management Utility
@@ -24,12 +23,13 @@ import sys
 sys.path.append("support")
 sys.path.append("modules")
 
-import Mk4py as mk
+#import Mk4py as mk
+import MySQLdb as db
 from server_constants import *
 
 # import any available modules.
 for file in os.listdir("modules"):
-    if (file.endswith(".py")):
+    if file.endswith(".py"):
         file = file.split(".")[0]
         exec("from " + file + " import *")
 
@@ -37,44 +37,36 @@ try:
     module = sys.argv[1]
     cmd    = sys.argv[2]
     
-    if (cmd == "create" or cmd == "drop" or cmd == "dump"):
+    if cmd in ("create", "drop", "dump"):
         project = sys.argv[3]
 except:
     print "usage: dbs <module> [list] [<create|drop|dump> <proj>]" 
     sys.exit(1)
 
-db = mk.storage("databases/" + module + ".db", 1)
-
+_db = db.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
+cursor = _db.cursor()
 ### LIST ###############################################################################################################
-if (cmd == "list"):
+if cmd == "list":
     print "views:",
-    
-    for table in db.contents().properties():
-        if (table.startswith("__") and table.endswith("__")):
-            continue
-            
-        print table,
 
-    #view = db.view(table)
-    #for struct in view.structure():
-    #    print "\t",
-    #    print struct
-    
-    print
+
+    cursor.execute("SELECT * FROM projects")
+    for one in cursor.fetchall():
+        print one[1]
 
 ### CREATE / DROP ######################################################################################################    
-elif (cmd == "create" or cmd == "drop"):
+elif cmd in ("create", "drop"):
     print "%s view: %s" % (cmd, project)
 
     # ensure the requested module is available..
     module_found = False
 
     for file in os.listdir("modules"):
-        if (file.endswith(".py")):
-            if (file == module + ".py"):
+        if file.endswith(".py"):
+            if file == module + ".py":
                 module_found = True
 
-    if (not module_found):
+    if not module_found:
         print "module: %s, not found." % module
         sys.exit(1)
     
@@ -82,11 +74,11 @@ elif (cmd == "create" or cmd == "drop"):
     exec("module.%s(\"%s\")" % (cmd, project))
     
 ### DUMP ###############################################################################################################
-elif (cmd == "dump"):
+elif cmd == "dump":
     print "dumping view of %s" % project
 
     for row in db.view(project):
-        if (module == "ida_sync"):
+        if module == "ida_sync":
             if type == server_constants.NAME or type == server_constants.STACK_NAME:
                 data = row.data.split("*")[0]
             else:

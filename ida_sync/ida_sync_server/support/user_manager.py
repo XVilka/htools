@@ -15,15 +15,17 @@
 # this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place, Suite 330, Boston, MA 02111-1307 USA
 
-import Mk4py as mk
+#import Mk4py as mk
 from serverx import *
+from server_constants import *
+import MySQLdb
 
 ################################################################################
 ### user_manager
 ###
 ### this class provides an interface for the general management of users.
 ###
-class user_manager:
+class user_manager(object):
     ############################################################################
     ### constructor
     ###
@@ -33,10 +35,16 @@ class user_manager:
     ###
     def __init__(self):
         # open the users database, creating it if it doesn't exist.
-        self.db = mk.storage("databases/users.db", 1)
+        #self.db = mk.storage("databases/users.db", 1)
+        self.db = MySQLdb.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
+        self.cursor = self.db.cursor()
+        #this doesn't work, dunno why
+        #self.cursor.execute("CREATE TABLE IF NOT EXISTS `users` (`id` int(5) auto_increment, `name` varchar(50), `pass` varchar(50), `realname` varchar(50), PRIMARY KEY (`id`))")
+        self.cursor.execute("SHOW TABLES LIKE \"users\"")
 
-        # define the user table (view) if it doesn't already exist.
-        self.view = self.db.getas("users[username:S,password:S,realname:S]")
+        if not self.cursor.fetchone():
+            self.cursor.execute("CREATE TABLE `users` (`id` int(5) auto_increment, `username` varchar(50), `pass` varchar(50), `realname` varchar(50), PRIMARY KEY (`id`))")
+
 
 
     ############################################################################
@@ -50,16 +58,21 @@ class user_manager:
     ###
     def add(self, username, password, realname):
         # ensure the user doesn't already exist.
-        if (self.view.find(username=username) != -1):
+        if self._finduser(username):
             raise serverx("username already exists")
 
-        # add the user and commit the changes.
-        self.view.append(username=username,
-                         password=password,
-                         realname=realname)
+        self.cursor.execute("INSERT INTO users VALUES(NULL, '%s', '%s', '%s')" % (username, password, realname))
 
-        self.db.commit()
 
+    def _finduser(self, username):
+        if not username.isalpha():
+            raise serverx("username should containts only alpha characters")
+
+        self.cursor.execute("SELECT * FROM users WHERE username = '%s'" % username)
+        result = self.cursor.fetchone()
+        if result:
+            return result
+        return None
 
     ############################################################################
     ### delete()
@@ -70,15 +83,11 @@ class user_manager:
     ###
     def delete(self, username):
         # ensure the user exists.
-        index = self.view.find(username=username)
 
-        if (index == -1):
+        if not self._finduser(username):
             raise serverx("username not found")
 
-        # remove the user and commit the changes.
-        self.view.delete(index)
-
-        self.db.commit()
+        self.cursor.execute("DELTE FROM users WHERE username = `%s`" % username)
 
 
     ############################################################################
@@ -89,7 +98,9 @@ class user_manager:
     ### returns: none.
     ###
     def list(self):
-        return self.view.sort(self.view.username)
+        self.cursor.execute("SELECT * FROM users")
+        return self.cursor.fetchall()
+        
 
 
     ############################################################################
@@ -102,23 +113,12 @@ class user_manager:
     ### returns: none.
     ###
     def update(self, username, password, realname):
-        # ensure the user exists.
-        index = self.view.find(username=username)
 
-        if (index == -1):
-            raise serverx("username not found")
+        if not self._finduser(username):
+            raise serverx("user not found")
 
-        # remove the user.
-        self.view.delete(index)
-
-        # insert the updated user in it's place.
-        self.view.insert(index, username=username,
-                                password=password,
-                                realname=realname)
-
-        # commit the changes.
-        self.db.commit()
-
+        self.delete(username)
+        self.add(username, password, realname)
 
     ############################################################################
     ### validate()
@@ -130,13 +130,11 @@ class user_manager:
     ###
     def validate(self, username, password):
         # ensure the user exists.
-        index = self.view.find(username=username, password=password)
 
-        if (index == -1):
-            raise serverx("invalid username or password")
+        user = self._finduser(username)
 
-        # see if the passwords match.
-        user = self.view[index]
+        if not user:
+            raise serverx("username not found")
 
-        if (user.password != password):
+        if (user[2] != password):
             raise serverx("invalid username or password")
