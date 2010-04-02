@@ -23,7 +23,6 @@ import sys
 sys.path.append("support")
 sys.path.append("modules")
 
-#import Mk4py as mk
 import MySQLdb as db
 from server_constants import *
 
