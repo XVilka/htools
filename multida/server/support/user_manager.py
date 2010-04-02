@@ -1,5 +1,6 @@
-# IDA Sync Server User Management Class
+# Multida Server User Management Class
 # Copyright (C) 2005 Pedram Amini <pedram.amini@gmail.com>
+# Copyright (C) 2010 Jiří Suchan <yed@vanyli.net>
 # 
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
