@@ -31,15 +31,18 @@ class ida_sync(object):
     ### returns: none.
     ###
     def __init__(self):
-        # open the IDA Sync database, creating it if it doesn't exist.
+        '''
+        open the IDA Sync database, creating it if it doesn't exist.
+        '''
+
         self.db = db.connect(host=DB_HOST, user=DB_USER, passwd=DB_PASS, db=DB_NAME)
         self.cursor = self.db.cursor()
 
-        self.cursor.execute("SHOW TABLES LIKE \"projects\"")
+        self.cursor.execute("SHOW TABLES LIKE \"project\"")
 
         if not self.cursor.fetchone():
-            self.cursor.execute("""
-                CREATE TABLE projects (
+            self.cursor.execute("""s
+                CREATE TABLE project (
                     `id` int(5) auto_increment,
                     `name` varchar(50),
                     PRIMARY KEY (`id`)
@@ -47,13 +50,16 @@ class ida_sync(object):
                 )""")
 
             self.cursor.execute("""
-                CREATE TABLE records (
+                CREATE TABLE record (
                     `id` int(9) auto_increment,
                     `project_id` int(5),
-                    `user_id` int(5),
-                    `teatime` timestamp,
-                    
-                    
+                    `user_id`   int(5),
+                    `teatime`   timestamp,
+                    `address`   varchar(20),
+                    `type`      int(5),
+                    `data`      text,
+                    `start`     varchar(20),
+
                     PRIMARY KEY (`id`),
                     CONSTRAINT `projectid_to_project` FOREIGN KEY (`project_id`) REFERENCES `project` (`id`),
                     CONSTRAINT `userid_to_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
@@ -65,6 +71,9 @@ class ida_sync(object):
         #description = "__last__[username:S,project:S,timestamp:L]"
 
     def last_view(self, username=None, project=None):
+        '''
+        returns user's last records from project
+        '''
 
         if not username:
             username = self.username
@@ -75,16 +84,17 @@ class ida_sync(object):
         self.cursor.execute("""
             SELECT *
             FROM
-                records
+                record
             LEFT JOIN
-                users ON users.id = records.user_id
+                users ON users.id = record.user_id
             WHERE
-                users.username = %s
+                users.username = '%s'
             AND
-                projects.name = %s
+                project.name = '%s'
             ORDER BY
                 id DESC
             LIMIT 1""" % (username, project))
+
         return self.cursor.fetchone()
 
     ############################################################################
@@ -110,15 +120,12 @@ class ida_sync(object):
         self.username    = username
         self.password    = password
 
-        # retrieve the project view.
-        #self.proj_view = self.db.view(project)
-
         # create an exception if the view doesn't exist.
         if not self._findproject(self.project):
             raise serverx("requested project not found.")
 
         # determine the user's last update.
-        index = self.last_view(username=username, project=project)
+        index = self.last_view()
 
         if index:
             last = index[3] #timestamp
@@ -130,9 +137,9 @@ class ida_sync(object):
 
         print ">>DEBUG %08x" % last
 
-         # locate all changes made since the user's last update.
-        index   = self.proj_view.filter(lambda row: row.timestamp >= last)
-        subview = self.proj_view.remapwith(index)
+        # locate all changes made since the user's last update.
+        #index   = self.proj_view.filter(lambda row: row.timestamp >= last)
+        subview = self._get_from(last)
 
         # XXX - this is a cheap hack because the IDA plugin doesn't seem to
         # process the first message.
@@ -149,12 +156,43 @@ class ida_sync(object):
         # reset the last update time.
         self.update_last()
 
+    def _get_from(self, index=None, address=None, start=None):
+
+        q = """
+            SELECT *
+            FROM
+                record AS r
+            LEFT JOIN project AS p
+                ON p.project_id = r.id
+            LEFT JOIN user AS u
+                ON u.id = record.user_id
+            WHERE
+                p.name = '%s'
+            AND
+                u.username = '%s'
+            """ % (self.project, self.username)
+
+        if index:
+            q += ' AND r.id = %d' % index
+
+        if address:
+            q += ' AND r.address = %s' % address
+
+        if start:
+            q += ' AND r.start = %s' % start
+
+        if start or address or index:
+            return self.cursor.fetchone()
+        
+        else:
+            self.cursor.execute(q)
+            return self.cursor.fetchall()
 
     def _findproject(self, project):
         if not project.isalpha():
             raise serverx("project name can containts only alpha character")
         
-        result = self.cursor.execute("SELECT * FROM projects WHERE name = \"%s\"" % project)
+        result = self.cursor.execute("SELECT * FROM project WHERE name = \"%s\"" % project)
         
         if not result:
             return None
@@ -162,139 +200,99 @@ class ida_sync(object):
         return result
 
 
-    ############################################################################
-    ### create()
-    ###
-    ### args:    project - table (view) to create.
-    ### raises:  none.
-    ### returns: none.
-    ###
     def create(self, project):
+        '''
+        creates project
+        '''
         if self._findproject(project):
             raise serverx("project '%s' already exists" % project)
 
-        self.cursor.execute("INSERT INTO projects VALUES(NULL, \"%s\")" % project)
+        self.cursor.execute("INSERT INTO project VALUES(NULL, \"%s\")" % project)
         #self.db.getas(project + "[type:I,address:L,data:S,timestamp:L,user:S]")
         
 
-    ############################################################################
-    ### delete_row()
-    ###
-    ### args:    address - address of data to erase.
-    ###          type    - type of data to erase at address.
-    ### raises:  none.
-    ### returns: none.
-    ###
     def delete_row(self, address, type):
-        # we can't just search for an exact address/type match because a regular
-        # comment and a repeatable comment are considered overlapping.
+        '''
+        we can't just search for an exact address/type match because a regular
+        comment and a repeatable comment are considered overlapping.
+        '''
         start = 0
-        while (1):
-            index = self.proj_view.find(address=address, start=start)
+        while True:
+            index = self._get_from(address=address, start=start)
             start = start + 1
 
-            if (index == -1):
+            if not index:
                 break
 
-            row  = self.proj_view[index]
-
             # data types are the same.
-            if (type == row.type):
-                self.proj_view.delete(index)
+            if type == index[5]: # index 5 == type
+                self.cursor.execute("""
+                DELETE FROM record
+                WHERE
+                    id = %d
+                LIMIT 1
+                    """ % (index[0]))
 
             # data types are both comments.
-            if ((type     == server_constants.REG_COMMENT or type     == server_constants.REP_COMMENT) and
-                (row.type == server_constants.REG_COMMENT or row.type == server_constants.REP_COMMENT)):
-                    self.proj_view.delete(index)
+            if type in (server_constants.REG_COMMENT, server_constants.REP_COMMENT) and \
+                row.type in (server_constants.REG_COMMENT, server_constants.REP_COMMENT):
+                self.cursor.execute("""
+                DELETE FROM record
+                WHERE
+                    id = %d
+                LIMIT 1
+                    """ % (index[0]))
 
-        # commit changes to database.
-        self.db.commit()
-
-
-    ############################################################################
-    ### drop()
-    ###
-    ### args:    project - table (view) to drop.
-    ### raises:  none.
-    ### returns: none.
-    ###
     def drop(self, project):
-        # drop the project table (view).
-        self.db.getas(project)
+        '''
+        drop project and all its records
+        '''
+        id = self._findproject(project)[0]
 
-        # erase all last update records associated with the project to remove.
-        subview = self.last_view.filter(lambda row: row.project == project)
-        self.last_view.remove(subview)
+        self.cursor.execute("""
+            DELETE FROM record
+            WHERE project_id = %d """ % id)
 
-        # commit changes to database.
-        self.db.commit()
+        self.cursor.execute("""
+            DELETE FROM project WHERE id = %d""" % id)
 
 
-    ############################################################################
-    ### list_projects()
-    ###
-    ### args:    none.
-    ### raises:  none.
-    ### returns: none.
-    ###
     def list_projects(self):
-        project_list = []
-        projects     = self.db.contents().properties()
-
-        for project in projects:
-            # ignore the internal databases.
-            if (project != "__last__"):
-                project_list.append(project)
-
-        project_list.sort()
-        return project_list
+        '''
+        list all projects
+        '''
+        self.cursor.execute("SELECT * FROM project")
+        return self.cursor.fetchall()
 
 
-    ############################################################################
-    ### list_rows()
-    ###
-    ### args:    project - list rows for this project.
-    ### raises:  none.
-    ### returns: none.
-    ###
     def list_rows(self, project):
-        return self.db.view(project)
+        '''
+        list all records
+        '''
+        self.cursor.execute("SELECT * FROM record")
+        return self.cursor.fetchall()
 
 
-    ############################################################################
-    ### reset_last()
-    ###
-    ### args:    username -
-    ###          project  -
-    ### raises:  none.
-    ### returns: none.
-    ###
     def reset_last(self, username, project):
-        index = self.last_view.find(username=username, project=project)
+        '''
+        delete last record
+        '''
+        index = self.last_view()
 
-        # if a last update entry already exists for this user, remove it.
-        if (index != -1):
-            self.last_view.delete(index)
-
-        # commit the changes.
-        self.db.commit()
+        if index:
+            self.delete_record(index)
 
 
-    ############################################################################
-    ### run() *** main handler routine ***
-    ###
-    ### args:    none.
-    ### raises:  exception on failure.
-    ### returns: none.
-    ###
     def run(self):
-        # enter an infinite read loop to process all inbound requests.
-        while 1:
+        '''
+        enter an infinite read loop to process all inbound requests.
+        '''
+        while True:
             try:
                 buf = self.sock.recv(1024)
                 buf = buf.rstrip("\n")
 
-                if (not buf):
+                if not buf:
                     raise Exception
             except:
                 msg = "[!] connection from %s for ida_sync::%s closed." % (self.sock.getpeername()[0], self.project)
@@ -311,7 +309,7 @@ class ida_sync(object):
                 continue
 
             # print to console.
-            if type == server_constants.NAME or type == server_constants.STACK_NAME:
+            if type in (server_constants.NAME, server_constants.STACK_NAME):
                 print_data = data.split("*")[1]
             else:
                 print_data = data
@@ -329,29 +327,24 @@ class ida_sync(object):
                                   user      = self.username)
 
             # commit changes to database.
-            self.db.commit()
+            # self.db.commit()
 
             # walk through all active connections and relay the received data
             # to all equivalent module/project combinations.
             for conn in self.connections:
                 # ignore the current connection.
-                if (conn == self.connection):
+                if conn == self.connection:
                     continue
 
-                if (conn[server_constants.MODULE] == "ida_sync" and conn[server_constants.PROJECT] == self.project):
+                if conn[server_constants.MODULE] == "ida_sync" and conn[server_constants.PROJECT] == self.project:
                     conn[server_constants.SOCK].sendall(buf)
                     self.update_last(conn[server_constants.USERNAME], conn[server_constants.PROJECT])
 
 
-    ############################################################################
-    ### update_last()
-    ###
-    ### args:    username -
-    ###          project  -
-    ### raises:  none.
-    ### returns: none.
-    ###
     def update_last(self, username=None, project=None):
+        '''
+        update last... something
+        '''
 
         username = username or self.username
         project = project or self.project

@@ -22,18 +22,18 @@ import sys
 
 sys.path.append("support")
 from user_manager import *
-from serverx       import *
+from serverx import *
 
 try:
     command = sys.argv[1]
     
-    if (command != "list"):
+    if command != "list":
         username = sys.argv[2]
 except:
     print "usage: users [add|delete|validate <username>] [list]"
     sys.exit(1)
 
-if (command == "add"):
+if command == "add":
     password = getpass.getpass("password> ")
     realname = raw_input("realname> ")
     
@@ -54,13 +54,13 @@ elif (command == "delete"):
         print x
         sys.exit(1)
 
-elif (command == "list"):
+elif command == "list":
     um = user_manager()
     
     for user in um.list():
         print user[1] + ", " + user[3]
 
-elif (command == "validate"):
+elif command == "validate":
     password = getpass.getpass("password> ")
     
     um = user_manager()

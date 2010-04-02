@@ -79,7 +79,7 @@ elif cmd == "dump":
 
     for row in db.view(project):
         if module == "ida_sync":
-            if type == server_constants.NAME or type == server_constants.STACK_NAME:
+            if type in (server_constants.NAME, server_constants.STACK_NAME):
                 data = row.data.split("*")[0]
             else:
                 data = row.data
