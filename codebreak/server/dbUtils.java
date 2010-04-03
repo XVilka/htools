@@ -1,7 +1,8 @@
 /*
-    collabREate Utils
+    Code Break Utils
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,7 +19,7 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 import java.io.*;
 import java.net.*;
@@ -29,12 +30,9 @@ import java.util.*;
 /**
  * dbUtils
  * This class offers various utility functions used by the servlet
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
 
-public class dbUtils implements CollabreateConstants {
+public class dbUtils implements CodeBreakConstants {
 
    /**
     * getJDBCConnection sets up and returns a JDBC connection
@@ -59,14 +57,14 @@ public class dbUtils implements CollabreateConstants {
       }
 
       try {
-	 String userid = props.getProperty("DB_USER", "collabreate");
+	 String userid = props.getProperty("DB_USER", "codebreak");
 	 String password = props.getProperty("DB_PASS");
 	 if (password == null) {
 	    //need to prompt for the password
 	 }
 	 String url = props.getProperty("JDBC_URL");
 	 if (url == null) {
-	    String dbname = props.getProperty("DB_NAME", "collabreate");
+	    String dbname = props.getProperty("DB_NAME", "codebreak");
 	    String host = props.getProperty("DB_HOST", "127.0.0.1");
 	    String ssl = props.getProperty("USE_SSL", "no");
 	    String dbtype = props.getProperty("JDBC_NAME", "postgresql");

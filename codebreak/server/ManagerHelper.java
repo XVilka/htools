@@ -1,7 +1,8 @@
 /*
-    collabREate ManagerHelper
+    Code Break Manager Helper
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,7 +19,7 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 import java.io.*;
 import java.net.*;
@@ -29,12 +30,9 @@ import java.util.*;
  * ManagerHelper
  * This class is intented to facilitate getting current status information to
  * the ServerManager class.
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
 
-public class ManagerHelper extends Thread implements CollabreateConstants {
+public class ManagerHelper extends Thread implements CodeBreakConstants {
 
    private static final String DEFAULT_PORT = "5043";
    private static final String DEFAULT_LOCAL = "1";
@@ -124,7 +122,7 @@ public class ManagerHelper extends Thread implements CollabreateConstants {
                dos = new DataOutputStream(s.getOutputStream());
                logln("New Management connection: " + s.getInetAddress().getHostAddress() + ":" + s.getPort(), LINFO);
                while (true) {
-                  CollabreateOutputStream os = new CollabreateOutputStream();
+                  CodeBreakOutputStream os = new CodeBreakOutputStream();
                   int len = dis.readInt();
                   int cmd = dis.readInt();
 

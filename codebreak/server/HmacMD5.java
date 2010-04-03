@@ -1,7 +1,8 @@
 /*
-    collabREate HmacMD5
+    Code Break HmacMD5
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -16,9 +17,8 @@
     You should have received a copy of the GNU General Public License along with
     this program; if not, write to the Free Software Foundation, Inc., 59 Temple
     Place, Suite 330, Boston, MA 02111-1307 USA
-*/
- 
-package collabreate.server;
+*/ 
+package codebreak.server;
 
 import java.security.*;
 
@@ -27,9 +27,6 @@ import java.security.*;
  * This class is responsible for computing an HmacMD5 value
  * for use in the challenge and response authentication portion
  * of a collabreate server connection, see RFC 2104
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
 
 public class HmacMD5 {

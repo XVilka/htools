@@ -1,7 +1,8 @@
 /*
-    collabREate CollabreateServer
+    Code Break Server
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,7 +19,7 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 import java.io.*;
 import java.net.*;
@@ -28,14 +29,11 @@ import java.security.*;
 
 
 /**
- * CollabreateServer
+ * CodeBreakServer
  * This class is responsible for accepting new incoming client
  * connections and passing them along to the ConnectionManager
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
-public class CollabreateServer extends Thread implements CollabreateConstants {
+public class CodeBreakServer extends Thread implements CodeBreakConstants {
 
    /**
     * the tcp port to default to if no config is specified
@@ -52,10 +50,10 @@ public class CollabreateServer extends Thread implements CollabreateConstants {
    private int verbosityLevel = DEFAULT_VERBOSITY;
 
    /**
-    * CollabreateServer Construct a server object that pulls options from a config file 
+    * CodeBreakServer Construct a server object that pulls options from a config file 
     * @param configFile A configuration file to read for options 
     */
-   protected CollabreateServer(String configFile) throws Exception {
+   protected CodeBreakServer(String configFile) throws Exception {
       try {
          FileInputStream fis = new FileInputStream(configFile);
          props.load(fis);
@@ -67,9 +65,9 @@ public class CollabreateServer extends Thread implements CollabreateConstants {
    }
 
    /**
-    * CollabreateServer Construct a server object that uses default settings
+    * CodeBreakServer Construct a server object that uses default settings
     */
-   protected CollabreateServer() throws Exception {
+   protected CodeBreakServer() throws Exception {
       initCommon();
    }
 
@@ -149,14 +147,14 @@ public class CollabreateServer extends Thread implements CollabreateConstants {
       }
 
       try {
-         String userid = props.getProperty("DB_USER", "collabreate");
+         String userid = props.getProperty("DB_USER", "codebreak");
          String password = props.getProperty("DB_PASS");
          if (password == null) {
             //need to prompt for the password
          }
          String url = props.getProperty("JDBC_URL");
          if (url == null) {
-            String dbname = props.getProperty("DB_NAME", "collabreate");
+            String dbname = props.getProperty("DB_NAME", "codebreak");
             String host = props.getProperty("DB_HOST", "127.0.0.1");
             String ssl = props.getProperty("USE_SSL", "no");
             String dbtype = props.getProperty("JDBC_NAME", "postgresql");
@@ -263,13 +261,13 @@ public class CollabreateServer extends Thread implements CollabreateConstants {
     */
 
    public static void main(String args[]) throws Exception {
-      CollabreateServer cs = null;
+      CodeBreakServer cs = null;
       if (args.length == 1) {
          //user specified a config file
-         cs = new CollabreateServer(args[0]);
+         cs = new CodeBreakServer(args[0]);
       }
       else {
-         cs = new CollabreateServer();
+         cs = new CodeBreakServer();
       }
       cs.start();
    }

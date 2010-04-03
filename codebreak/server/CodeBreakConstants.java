@@ -1,7 +1,9 @@
 /*
-    collabREate CollabreateConstants
+    Code Break Constants
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
+
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,18 +20,15 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 /**
- * CollabreateConstants
+ * CodeBreakConstants
  * This interface defines various constants used throughout
- * the collabreate server
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
+ * the codebreak server
  */
 
-public interface CollabreateConstants {
+public interface CodeBreakConstants {
 
    public static final long default_pub = 0x3fff;
    public static final long default_sub = 0x3fff;
@@ -212,12 +211,12 @@ public interface CollabreateConstants {
    public static final int LDEBUG   = 15;
  
 
-   public static final String FILE_SIG = "collabRE";
+   public static final String FILE_SIG = "CodeBreak";
    public static final int FILE_VER = 1;
    public static final int TAG = 0xC077ABE8;
    public static final int ENDTAG = 0xDEADBEEF;
 
-   //could extend to CollabreateManagerInterface i guess
+   //could extend to CodeBreakManagerInterface i guess
    public static final int MODE_DB = 1;
    public static final int MODE_BASIC = 2;
 

@@ -1,7 +1,8 @@
 /*
-    collabREate ProjectInfo
-    Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Code Break Project Info
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
+    Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,15 +19,13 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 /**
  * ProjectInfo is a helper classe to represent information pertitent
  * to a single project
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
+
 public class ProjectInfo {
    public int lpid;
    public String desc;

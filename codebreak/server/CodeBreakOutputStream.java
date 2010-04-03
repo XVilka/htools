@@ -1,7 +1,8 @@
 /*
-    collabREate CollabreateOutputStream
+    Code Break Server
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,31 +19,28 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 import java.io.*;
 
 /**
- * CollabreateOutputStream
+ * CodeBreakOutputStream
  * This class wraps a DataOutputStream around a ByteArrayOutputStream for 
  * convenience in building data packets.
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
 
-public class CollabreateOutputStream implements DataOutput {
+public class CodeBreakOutputStream implements DataOutput {
 
    private ByteArrayOutputStream baos;
    private DataOutputStream dos;
 
    /**
-    * CollabreateOutputStream
+    * CodeBreakOutputStream
     * This class wraps a DataOutputStream around a ByteArrayOutputStream for 
     * convenience in building data packets, for those familiar with these classes
     * the methods should be self explanitory.
     */
-   public CollabreateOutputStream() {
+   public CodeBreakOutputStream() {
       baos = new ByteArrayOutputStream();
       dos = new DataOutputStream(baos);
    }

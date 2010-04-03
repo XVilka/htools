@@ -1,7 +1,8 @@
 /*
-    collabREate Client
+    Code Break Client
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
@@ -18,7 +19,7 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package collabreate.server;
+package codebreak.server;
 
 import java.io.*;
 import java.net.*;
@@ -31,13 +32,10 @@ import java.util.*;
  * It handles the initial client interaction, then reads
  * incoming client commands and kicks them up to the ConnectionManager
  * which farms the commands out to all interested clients
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
 
 
-public class Client extends Thread implements CollabreateConstants {
+public class Client extends Thread implements CodeBreakConstants {
 
    /**
     * Constant to check for an invalid uid
@@ -93,7 +91,7 @@ public class Client extends Thread implements CollabreateConstants {
       }
       else {
          //these are used only for the 'auto auth' in BASIC mode
-         CollabreateOutputStream authos = new CollabreateOutputStream();
+         CodeBreakOutputStream authos = new CodeBreakOutputStream();
          logln("sending AUTH_CONNECTED");
          cm.authenticate(this, null, null, null);
          authenticated = true;
@@ -294,7 +292,7 @@ public class Client extends Thread implements CollabreateConstants {
     */
    protected void sendForkFollow(String fuser, String gpid, long lastupdateid, String desc) {
       try {
-         CollabreateOutputStream cos = new CollabreateOutputStream();
+         CodeBreakOutputStream cos = new CodeBreakOutputStream();
          logln("Sending forkfollow for " + gpid + " initiated by " + fuser + " at updateid " + lastupdateid, LINFO2);
          cos.writeUTF(fuser);
          cos.write(Utils.toByteArray(gpid));
@@ -309,7 +307,7 @@ public class Client extends Thread implements CollabreateConstants {
    protected void send_error_msg(String theerror,int type) {
       try {
          logln("Protocol error detected: " + theerror,LERROR);
-         CollabreateOutputStream os = new CollabreateOutputStream();
+         CodeBreakOutputStream os = new CodeBreakOutputStream();
          os.writeUTF(theerror);
          byte[] theerrorba = os.toByteArray(); 
          dos.writeInt(8 + theerrorba.length);
@@ -368,7 +366,7 @@ public class Client extends Thread implements CollabreateConstants {
       try {
          main_loop:
          while (true) {
-            CollabreateOutputStream os = new CollabreateOutputStream();
+            CodeBreakOutputStream os = new CodeBreakOutputStream();
             int len = dis.readInt();
             int command = dis.readInt();
             logln("received data len: " + len + ", cmd: " + command, LDEBUG);
@@ -497,7 +495,7 @@ public class Client extends Thread implements CollabreateConstants {
                            os.writeInt(JOIN_REPLY_FAIL);
                            send_data(MSG_PROJECT_JOIN_REPLY, os.toByteArray());
                            send_error("Tried to join a project that doesn't exist on this server:" + gpid);
-                           send_fatal("This idb is associated with a project not found on this server.\n Maybe you connected to the wrong collabREate server,\n or maybe the project has been deleted...");
+                           send_fatal("This idb is associated with a project not found on this server.\n Maybe you connected to the wrong Code Break server,\n or maybe the project has been deleted...");
                            break main_loop;
                         }
                      } catch (Exception e) {

@@ -1,26 +1,27 @@
 /*
-   collabREate ServerManager
-   Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
-   Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Code Break Server
+    Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
+    Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
 
-   This program is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as published by the Free
-   Software Foundation; either version 2 of the License, or (at your option)
-   any later version.
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2 of the License, or (at your option)
+    any later version.
 
-   This program is distributed in the hope that it will be useful, but WITHOUT
-   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
-   more details.
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
 
-   You should have received a copy of the GNU General Public License along with
-   this program; if not, write to the Free Software Foundation, Inc., 59 Temple
-   Place, Suite 330, Boston, MA 02111-1307 USA
- */
+    You should have received a copy of the GNU General Public License along with
+    this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+    Place, Suite 330, Boston, MA 02111-1307 USA
+*/
 
 //JDBC
 
-package collabreate.server;
+package codebreak.server;
 
 import java.io.*;
 import java.net.*;
@@ -30,13 +31,10 @@ import java.util.*;
 /**
  * ServerManager
  * This class is responsible for routine server related operations
- * @author Tim Vidas
- * @author Chris Eagle
- * @version 0.1.0, August 2008
  */
 
 
-public class ServerManager implements CollabreateConstants {
+public class ServerManager implements CodeBreakConstants {
 
    private boolean done = false;
 
@@ -438,7 +436,7 @@ public class ServerManager implements CollabreateConstants {
                   System.err.println("This project was forked.  Note: lineage is not preserved with export.");
                }
                FileOutputStream fos = new FileOutputStream(efile);
-               CollabreateOutputStream os = new CollabreateOutputStream();
+               CodeBreakOutputStream os = new CodeBreakOutputStream();
 
                os.writeBytes(FILE_SIG);
                os.writeInt(FILE_VER);
@@ -538,7 +536,7 @@ public class ServerManager implements CollabreateConstants {
             System.out.println("desc: " + desc);
 
             //addproject
-            CollabreateOutputStream os = new CollabreateOutputStream();
+            CodeBreakOutputStream os = new CodeBreakOutputStream();
             os.writeInt(newowner);
             os.write(gpid);
             os.write(hash);
@@ -586,7 +584,7 @@ public class ServerManager implements CollabreateConstants {
                System.out.print(".");
 
                //insertUpdate
-               CollabreateOutputStream cos = new CollabreateOutputStream();
+               CodeBreakOutputStream cos = new CodeBreakOutputStream();
                cos.writeInt(newowner);  //this is required becuase the original uid may
                //os.writeInt(uid);      //not be present on the new server (users aren't migrated yet)
                //cos.writeInt(newpid);  //similary, we could specify the newly created project
@@ -823,7 +821,7 @@ public class ServerManager implements CollabreateConstants {
    }
 
    /**
-    * main provides the cli interface for managing collabreate
+    * main provides the cli interface for managing codebreak
     */
    public static void main(String args[]) throws Exception {
       ServerManager sm = null;
@@ -849,7 +847,7 @@ public class ServerManager implements CollabreateConstants {
       BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
       while (true) {
          System.out.println("");
-         System.out.println("CollabREate Server Menu:");
+         System.out.println("Code Break Server Menu:");
          System.out.println("1)  Add user");
          System.out.println("2)  List users");
          System.out.println("3)  List Projects");
@@ -861,7 +859,7 @@ public class ServerManager implements CollabreateConstants {
          System.out.println("9)  Delete a Project");
          System.out.println("10) Quit");
          System.out.println("");
-         System.out.println(" * requires CollabREate Server to be running");
+         System.out.println(" * requires Code Break Server to be running");
          System.out.println("   others commands only require the database to be running ");
          System.out.print("Enter command: ");
          String resp = br.readLine();
