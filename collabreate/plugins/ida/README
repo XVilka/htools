@@ -1,0 +1,196 @@
+/*
+    IDA Pro Collabreation/Synchronization Plugin
+    Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
+    Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the Free
+    Software Foundation; either version 2 of the License, or (at your option)
+    any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT
+    ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+    FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
+    more details.
+
+    You should have received a copy of the GNU General Public License along with
+    this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+    Place, Suite 330, Boston, MA 02111-1307 USA
+
+*/
+
+Version 0.1.0 Initial Release.  Blackhat 2008.
+
+ 	
+BUILDING THE PLUGIN
+
+The IDA Pro plugin requires the IDA Pro SDK, which is distributed along with
+Pro.  You need the version of the SDK that matches the version of IDA with 
+which you indent to use the plugin.
+
+First you need to unpack the archive, you may wish to do this directly into
+a subdirectory of the SDK's plugins directory:
+
+tar -zxf collabreate.tgz
+
+Compiled binary plugins for IDA 4.9freeware, IDA5.0, IDA5.1, and IDA5.2 may
+be found in the collabreate/bin directory.
+
+The provided Makefile has an "IDA" variable which needs to point to the SDK
+directory.  If you have unpacked collabreate into 
+<SDKDIR>/plugins/collabreate, the default make file settings should work.
+
+make -f Makefile
+
+Or you may wish to use make's -e option to specify override the makefile's
+IDA with one from the system:
+
+IDA=../path/to/the/sdk
+export IDA
+make -e -f Makefile
+
+Upon successfull compilation, the plugin collabreate.plw will be located in 
+the <SDKDIR>/bin/plugins subdirectory of the SDK you built with (so it's 
+relative to the IDA variable)
+
+The provided Makefile has been tested most with Cygwin (requires make and gcc)
+A Visual Studio .sln and .vcproj file are also provided
+
+
+
+INSTALLING THE PLUGIN
+
+As with any IDA plugin, simply copy the .plw file into IDA's plugins directory
+which is probably something like C:\Program Files\IDA\plugins\
+
+Due to Windows' file locking, you will likely need to make sure IDA is closed
+before copying to this directory.
+
+
+
+USING THE PLUGIN
+
+It is intended that a new collabreation session is used for each binary loaded
+into IDA Pro.  Once a binary is loaded and the autoanalysis phase has completed
+you can activate CollabREate by pressing the hotkey ATL-F6 (which you can change
+in plugins.cfg if you need to)
+
+Upon activation you will be presented with a series of screens prompting you to 
+connect to a CollabREate server, authenticate, start a new project, etc.  The 
+exact series of steps will very upon the running mode of the server (such as if
+it is connected to a backend database or not).
+
+Typical Project Join Actions:
+ Connect:           Connects to a collabreate server (default port is 5042)
+ Authenticate:      Provide a User / Password to connect to the server
+ Choose Project:    Provides a list of 'related' projects (1)
+  New Project:      Request that the server creates a new project (2)
+  Existing Project: Join an existing project
+  Project Snapshot: Request a new project that is a Fork of an existing project
+                    at a particular, previously saved point (2)
+
+(1) only projects that match the MD5 of the binary loaded in IDA are displayed
+(2) when starting a new project you must provide a textual description
+
+When connecting to an existing project for the first time, you automatically
+recieve all updates that have been made to the project prior to you joining.
+On subsequent connections you will automatically receive any updates that have
+been made since the last time you were connected to the project.
+
+Once connected to a project, you can use IDA normally.  Updates you make are
+sent to the server, updates other collabreators make are reflected in your
+database.  The types of updates you can make depend on the version of IDA you
+are using, basically 5.1 and higher have the most functionality (see table 1) 
+for more information.
+
+Table 1: Collabreate capabilities by IDA version
+         P - publish, S - subscribe
+______________________________________________________
+             |  4.9  |  5.0  |  5.1  |  5.2  |  5.3  |
+             (incl FW)       |       |       |       |
+-------------+-------+-------+-------+-------|-------|
+Action       | P | S | P | S | P | S | P | S | P | S |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Undefine     | X | X | X | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Make code    | X | X | X | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Make data    | X | X | X | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Move segment | X | X | X | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Name changed |   | X |   | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Function     |   |   |   |   |   |   |   |   |   |   |
+added or     |   | X |   | X | X | X | X | X | X | X |
+deleted      |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Function     |   |   |   |   |   |   |   |   |   |   |
+bounds       |   | X |   | X | X | X | X | X | X | X |
+changed      |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Byte         |   |   |   |   |   |   |   |   |   |   |
+patched      |   | X |   | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Comment      |   |   |   |   |   |   |   |   |   |   |
+changed      |   | X |   | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Operand      |   |   |   |   |   |   |   |   |   |   |
+type         |   | X |   | X | X | X | X | X | X | X |
+changed      |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Enum created |   |   |   |   |   |   |   |   |   |   |
+or deleted   |   | X |   | X | X | X | X | X | X | X |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Struct       |   |   |   |   |   |   |   |   |   |   |
+created,     |   | X |   | X | X*| X | X*| X | X?| X |
+deleted,     |   |   |   |   |   |   |   |   |   |   |
+or changed   |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Function     |   |   |   |   |   |   |   |   |   |   |
+tail added   |   | X |   | X | X | X | X | X | X | X |
+or deleted   |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Segment      |   |   |   |   |   |   |   |   |   |   |
+added,       |   | X |   | X | X | X | X | X | X | X |
+deleted,     |   |   |   |   |   |   |   |   |   |   |
+or changed   |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Flirt        |   |   |   |   |   |   |   |   |   |   |
+function     |   | X |   | X |   | X | X | X | X | X |
+identified   |   |   |   |   |   |   |   |   |   |   |
+-------------+---+---+---+---+---+---+---+---|---+---|
+Xref add and |   |   |   |   |   |   |   |   |   |   |
+delete       |   | X |   | X |   | X |   | X | X | X |
+-----------------------------------------------------|
+
+* An updated IDA 5.2 kernel is required in order for full structure updates
+to be properly published.
+
+
+Pressing Alt-F6 after the plugin is already activated will bring up a menu of 
+collabreate specific commands.
+
+Collabreation Actions:
+ Disconnect:        Disconnect from the server.
+ Fork:              Immediatly fork the project with the updates that IDA has
+                    recieved and join this new project. (3)
+ Snapshot:          Save a snapshot (point in time) (3)
+ Manage Req Perms:  Allows the user to change the permissions requested when 
+                    joining the project
+ Manage Proj Perms: Allows the user (only if the user is the owner of the 
+                    project) to alter the project permissions.
+
+(3) the user must provide a textual desription
+
+Forking creates a new projet that can have further updates, and that others can
+participate in (join).  Snapshots are simply 'projects at a point in time' - not
+actual projects.  You can not 'join' a snapshot.  You must fork a new project
+from a snapshot.  Overall, snapshots take up much less space than forked 
+projects.
+
+
+If the server is connected to a database backend, a unique project id is stored
+in the idb file and subsequent connections to a server will automatically 
+connect to the correct project.
