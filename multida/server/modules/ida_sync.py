@@ -1,17 +1,17 @@
 # IDA Multida Server Module
 # Copyright (C) 2005 Pedram Amini <pedram.amini@gmail.com>
 # Copyright (C) 2010 Jiri Suchan <yed@vanyli.net>
-# 
+#
 # This program is free software; you can redistribute it and/or modify it
 # under the terms of the GNU General Public License as published by the Free
 # Software Foundation; either version 2 of the License, or (at your option)
 # any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful, but WITHOUT
 # ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for
 # more details.
-# 
+#
 # You should have received a copy of the GNU General Public License along with
 # this program; if not, write to the Free Software Foundation, Inc., 59 Temple
 # Place, Suite 330, Boston, MA 02111-1307 USA
@@ -46,8 +46,9 @@ class ida_sync(object):
                     `id` int(5) auto_increment,
                     `name` varchar(50),
                     PRIMARY KEY (`id`)
-                    
-                )""")
+
+                )
+                """)
 
             self.cursor.execute("""
                 CREATE TABLE record (
@@ -65,7 +66,6 @@ class ida_sync(object):
                     CONSTRAINT `userid_to_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 
                     )
-                
                 """)
         # if it doesn't already exist, define a view to track user updates.
         #description = "__last__[username:S,project:S,timestamp:L]"
@@ -183,7 +183,7 @@ class ida_sync(object):
 
         if start or address or index:
             return self.cursor.fetchone()
-        
+
         else:
             self.cursor.execute(q)
             return self.cursor.fetchall()
@@ -191,9 +191,9 @@ class ida_sync(object):
     def _findproject(self, project):
         if not project.isalpha():
             raise serverx("project name can containts only alpha character")
-        
+
         result = self.cursor.execute("SELECT * FROM project WHERE name = \"%s\"" % project)
-        
+
         if not result:
             return None
 
@@ -209,7 +209,7 @@ class ida_sync(object):
 
         self.cursor.execute("INSERT INTO project VALUES(NULL, \"%s\")" % project)
         #self.db.getas(project + "[type:I,address:L,data:S,timestamp:L,user:S]")
-        
+
 
     def delete_row(self, address, type):
         '''
