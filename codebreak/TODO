@@ -1,3 +1,34 @@
 1. server code refactor and split to base part and module for ida protocol
 2. Cleanup code and merge to similar parts - Network, Utils, DB
-
+   1.
+      1. Split all Server code to:
+   2.
+       
+   3.
+      Base and Modules (now only one - IDA)
+   4.
+       
+   5.
+      2. All code of Base server split/merge/refactor to this files
+   6.
+       
+   7.
+      Server (main file)
+   8.
+      Network (all network funcs)
+   9.
+      Utils (misc functions)
+  10.
+      DB (functions for working with DB)
+  11.
+      Crypto (crypto functions)
+  12.
+       
+  13.
+      3. All IDA specific features should be moved in modules section:
+  14.
+      DB struct and XML proto
+  15.
+       
+  16.
+      4. Cleanup code and use SIMPLe api for connecting BASE server and Modules
