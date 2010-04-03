@@ -41,7 +41,7 @@ class ida_sync(object):
         self.cursor.execute("SHOW TABLES LIKE \"project\"")
 
         if not self.cursor.fetchone():
-            self.cursor.execute("""s
+            self.cursor.execute("""
                 CREATE TABLE project (
                     `id` int(5) auto_increment,
                     `name` varchar(50),
