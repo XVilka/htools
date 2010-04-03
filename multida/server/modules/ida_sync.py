@@ -166,7 +166,7 @@ class ida_sync(object):
                 record AS r
             LEFT JOIN project AS p
                 ON p.project_id = r.id
-            LEFT JOIN user AS u
+            LEFT JOIN users AS u
                 ON u.id = record.user_id
             WHERE
                 p.name = '%s'
