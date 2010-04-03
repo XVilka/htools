@@ -374,6 +374,6 @@ class ida_sync(object):
         appending record to db
         '''
 
-        self.cursor.execute("""
+        #self.cursor.execute("""
         #
         #""" % username, project, timestamp
