@@ -1,3 +1,2 @@
-1. Move IDA Sync server to mysql DB
-2. Add mirroring server functionality
-3. Add support for plugin and server for beye (biew)
+1. Add mirroring/clastering server functionality
+2. Add support for plugin and server for beye (biew)

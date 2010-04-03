@@ -1,6 +1,6 @@
 This is very useful tools, which help us for hacking Motorola Milestone
 
-IDA Sync - distributed reverse engineeging tool with IDA
+codebreak - distributed reverse engineeging enviroment for IDA and other tools
 dhex - hexedit + diff
 dump - some kind of code, which we uses for reading RAM/ROM information
 
