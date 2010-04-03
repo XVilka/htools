@@ -1,6 +1,6 @@
 #!/bin/sh
 
-INSTALL_DIR=/opt/collabreate/server
+INSTALL_DIR=/opt/codebreak/server
 OPTIONS="Yes No"
 
 
@@ -12,13 +12,13 @@ else
 fi
 
 
-echo "this script will install the collabreate server."
+echo "this script will install the codebreak server."
 echo "Some options may require root privs (it might be easier to run this script as root)"
 echo "continue?"
 select o in $OPTIONS; do
   if [ "$o" = "Yes" ];
   then
-   if [ ! -f "collabreate_server.jar" ] && [ -f "build_jar.sh" ];
+   if [ ! -f "codebreak_server.jar" ] && [ -f "build_jar.sh" ];
    then
      echo "It looks like you haven't built the server jar file yet, should I try to build it?"
      select opt in $OPTIONS; do
@@ -41,20 +41,20 @@ select o in $OPTIONS; do
      echo "the server may not run as expected without the server.conf file"
    fi
 
-   if [ -f "collabreate_server.jar" ];
+   if [ -f "codebreak_server.jar" ];
    then
        echo "making directories"
       `$SU root -c "mkdir -p $INSTALL_DIR"`
        echo "copying server jar"
-      `$SU root -c "cp collabreate_server.jar $INSTALL_DIR/collabreate_server.jar"`
+      `$SU root -c "cp codebreak_server.jar $INSTALL_DIR/codebreak_server.jar"`
       DBJAR=`ls *.jar | grep -i "mysql\|postgres"`
       echo "copying db jar: $DBJAR"
       `$SU root -c "cp ./$DBJAR $INSTALL_DIR/"`
 
-      if [ -f "collabreate_manager.jar" ];
+      if [ -f "codebreak_manager.jar" ];
       then
         echo "copying manager jar"
-        `$SU root -c "cp collabreate_manager.jar $INSTALL_DIR/collabreate_manager.jar"`
+        `$SU root -c "cp codebreak_manager.jar $INSTALL_DIR/codebreak_manager.jar"`
       else
         echo "can't find manager jar file.  It might not have built correctly."
         echo "continuing with install anyway - you won't be able to use the management interface."

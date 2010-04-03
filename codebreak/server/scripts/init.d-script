@@ -1,8 +1,8 @@
 #!/bin/bash
 #
-#   /etc/rc.d/init.d/collabreate
+#   /etc/rc.d/init.d/codebreak
 #
-#   This controls the collabREate server component.
+#   This controls the Code Break server component.
 #   You must have java jre, and for database mode a 
 #       database mysql|postgresql, and the appropriate 
 #       jdbc connector installed and configured.
@@ -11,8 +11,8 @@
 # Author: Tim Vidas tvidas<at>gmail[dot]com   
 #
 # chkconfig: 2345 99 99 
-# description: collabREate server daemon.  Provides central \
-# collaborative point for those collabREating with IDA Pro.
+# description: Code Break server daemon.  Provides central \
+# collaborative point for those Code Break with IDA Pro.
 #
 # this file is based on the init.d sample script provided with fedora
 # it can be found at: /usr/share/doc/initscripts-####/sysvinitfiles
@@ -23,31 +23,31 @@
 . /etc/init.d/functions
 
 # these are user configurable - but you should prob them across all aux files #
-SERVICE_NAME=collabreate
+SERVICE_NAME=codebreak
 JAVA_OPTS="-verbose -jar"
-COLLAB_SERVER_JAR="collabreate_server.jar"
-COLLAB_MANAGER_JAR="collabreate_manager.jar"
-COLLAB_CONF="server.conf"
-IDENT="collab>"
+CODEBREAK_SERVER_JAR="codebreak_server.jar"
+CODEBREAK_MANAGER_JAR="codebreak_manager.jar"
+CODEBREAK_CONF="server.conf"
+IDENT="codebreak>"
 PID_FILE=/var/run/$SERVICE_NAME.pid
 
 # these can also be set via exported environmental variables                  #
-# eg:  >INSTALLDIR=/usr/local/collabreate/server                              #
+# eg:  >INSTALLDIR=/usr/local/codebreak/server                              #
 #      >export INSTALLDIR                                                     #
 #      >make install                                                          #
 # if you do set these via the environment, you should configure your system   #
 # to always set them (other scripts depend upon the values of these variables)#
-COLLAB_SERVER_DIR="${COLLAB_SERVER_DIR:-/opt/collabreate/server}"
-COLLAB_LOG="${COLLAB_LOG:-/var/log/collab}"
-COLLAB_SCRIPT="${COLLAB_SCRIPT:-/usr/sbin/collabctl}"
-COLLAB_USER="${COLLAB_USER:-collab}"
-COLLAB_GROUP="${COLLAB_GROUP:-collab}"
+CODEBREAK_SERVER_DIR="${CODEBREAK_SERVER_DIR:-/opt/codebreak/server}"
+CODEBREAK_LOG="${CODEBREAK_LOG:-/var/log/codebreak}"
+CODEBREAK_SCRIPT="${CODEBREAK_SCRIPT:-/usr/sbin/codebreakctl}"
+CODEBREAK_USER="${CODEBREAK_USER:-codebreak}"
+CODEBREAK_GROUP="${CODEBREAK_GROUP:-codebreak}"
 # end #
 
 #might be more portable:
-#if [ -z "$COLLAB_USER" ];
+#if [ -z "$CODEBREAK_USER" ];
 #then
-#   COLLAB_USER=collab
+#   CODEBREAK_USER=codebreak
 #fi
 
 
@@ -89,30 +89,30 @@ else
 fi
 
 
-#DAEMON="$JAVA_BIN -jar ./collabreate_server.jar ./server.conf >/dev/null 2>&1 &"
-#SHUTDOWNAPP="$JAVA_BIN -jar ./collabreate_manager.jar ./server.conf shutdown" 
+#DAEMON="$JAVA_BIN -jar ./codebreak_server.jar ./server.conf >/dev/null 2>&1 &"
+#SHUTDOWNAPP="$JAVA_BIN -jar ./codebreak_manager.jar ./server.conf shutdown" 
 
 
 start() {
-   echo -n "Starting collabreate server: "
-   echo "(init.d) start recieved " >> $COLLAB_LOG
-   apid=$(pgrep -u $COLLAB_USER java)
+   echo -n "Starting codebreak server: "
+   echo "(init.d) start recieved " >> $CODEBREAK_LOG
+   apid=$(pgrep -u $CODEBREAK_USER java)
    if checkpid $apid 2>&1; 
    then
       failure
       echo
-      echo " Sever appears already be running: pid $apid"
+      echo " Server appears already be running: pid $apid"
       return -1
    else
-      #echo "$SU - $COLLAB_USER -c "$COLLAB_SCRIPT start" >> $COLLAB_LOG 2>&1"
-     `$SU - $COLLAB_USER -c "$COLLAB_SCRIPT start" >> $COLLAB_LOG 2>&1`
+      #echo "$SU - $CODEBREAK_USER -c "$CODEBREAK_SCRIPT start" >> $CODEBREAK_LOG 2>&1"
+     `$SU - $CODEBREAK_USER -c "$CODEBREAK_SCRIPT start" >> $CODEBREAK_LOG 2>&1`
       RETVAL=$?
       if [ $RETVAL -eq 0 ]; 
       then
-         TPID=$(pgrep -u $COLLAB_USER java)
+         TPID=$(pgrep -u $CODEBREAK_USER java)
          `echo -n $TPID > $PID_FILE`
-         `touch /var/lock/subsys/collabreate`
-         `chown ${COLLAB_USER}:${COLLAB_USER} $PID_FILE`
+         `touch /var/lock/subsys/codebreak`
+         `chown ${CODEBREAK_USER}:${CODEBREAK_USER} $PID_FILE`
          success
          echo
       else
@@ -126,8 +126,8 @@ start() {
 }   
 
 stop() {
-   echo -n "Shutting down collabreate server: "
-   echo "(init.d) stop recieved " >> $COLLAB_LOG
+   echo -n "Shutting down codebreak server: "
+   echo "(init.d) stop recieved " >> $CODEBREAK_LOG
    #check for pid started from this script:
    if [ -f $PID_FILE ]; 
    then
@@ -136,7 +136,7 @@ stop() {
       read kpid < $PID_FILE
 
       #first try to 'safely' shutdown the server using the management application
-      `$SU - $COLLAB_USER -c "$COLLAB_SCRIPT stop" >> $COLLAB_LOG 2>&1`
+      `$SU - $CODEBREAK_USER -c "$CODEBREAK_SCRIPT stop" >> $CODEBREAK_LOG 2>&1`
       sleep 2
 
       #if it's still running, the script "stop" must not have worked
@@ -153,15 +153,15 @@ stop() {
          echo
       else
          rm -f $PID_FILE
-         rm -f /var/lock/subsys/collabreate
+         rm -f /var/lock/subsys/codebreak
          success
          echo
       fi
    else
-      failure $"Stopping collabreate server"
+      failure $"Stopping codebreak server"
       #echo -e "\n"A
-      #this basically assumes that collabreate is the only java process running as USER
-      apid=$(pgrep -u $COLLAB_USER java)
+      #this basically assumes that codebreak is the only java process running as USER
+      apid=$(pgrep -u $CODEBREAK_USER java)
       if checkpid $apid 2>&1; 
       then
          echo " The server may have been started without using this init script!"
@@ -184,13 +184,13 @@ case "$1" in
    ;;
     status)
    #relies upon a few things, like the location of the pid file
-   if status collabreate;
+   if status codebreak;
    then
       echo ""
    else
       #look for other pids, just in case
            #can't use pidofproc becuase it matches other java services
-      apid=$(ps ax | grep "$COLLAB_SERVER_JAR" |grep -v grep | cut -d" " -f1)
+      apid=$(ps ax | grep "$CODEBREAK_SERVER_JAR" |grep -v grep | cut -d" " -f1)
       if checkpid $apid 2>&1; 
       then
          echo " The server may have been started without using this init script!"

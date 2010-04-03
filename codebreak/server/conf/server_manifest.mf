@@ -1,10 +1,11 @@
-Main-Class: collabreate.server.CollabreateServer
+Main-Class: codebreak.server.CodeBreakServer
 Class-Path: postgresql-8.3-603.jdbc3.jar
-Name: collabreate/server/CollabreateServer/
-Specification-Title: CollabREate Server
-Specification-Version: 0.1.1
-Specification-Vendor: Chris Eagle & Tim Vidas.
-Implementation-Title: CollabREate Server
-Implementation-Version: Blackhat2008
-Implementation-Vendor: Chris Eagle & Tim Vidas
-Implementation-URL: www.idabook.com/blackhat/
+Name: codebreak/server/CodeBreakServer/
+Specification-Title: Code Break Server
+Specification-Version: 0.0.1
+Specification-Vendor: XVilka & Nothize.
+Implementation-Title: Code Break Server
+Implementation-Version: 0.0.1
+Implementation-Vendor: XVilka & Nothize
+Implementation-URL: www.and-developers.com
+
