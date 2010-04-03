@@ -1,12 +1,14 @@
 /*
-    IDA Pro Collabreation/Synchronization Plugin
+    Code Break Distributed Reverse Engineering Enviroment
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
+    Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
+    Copyright (C) 2010 Nothize <nothize at gmail d0t com>
 
 
     This program is free software; you can redistribute it and/or modify it
     under the terms of the GNU General Public License as published by the Free
-    Software Foundation; either version 2 of the License, or (at your option)
+    Software Foundation; either version 3 of the License, or (at your option)
     any later version.
 
     This program is distributed in the hope that it will be useful, but WITHOUT
@@ -20,18 +22,12 @@
 
 */
 
-Version 0.1.0 Initial release.  Blackhat 2008.
-
-Note:  This server component is also released as FC9 based virtual appliance.
-       This Virtual Machine is largely a stock FC9 GUI install, with postgres/
-       postgres-server, openjdk/openjdk-devel java 1.0.6 packages, and 
-       collabreate software already installed.
-       See www.vmware.com/appliances for more information.
+Version 0.0.1 Initial release.
 
 
 QUICKSTART GUIDE
 
-Of course you should read this entire file prior to using the collabreate server.
+Of course you should read this entire file prior to using the Code Break server.
 For the other 90% of users, here is a 6 step process that attempts to get you 
 started.
 
@@ -42,7 +38,7 @@ started.
 5) #make install  (optional)
 
 if you performed step 5 you can start the server by:
-6) #/etc/init.d/collabreate start
+6) #/etc/init.d/codebreak start
 
 if you chose not to install you can run from the build directory via scripts:
 6) #./launch_server.sh server.conf
@@ -62,7 +58,7 @@ default database type is PostgreSQL.
 
 BUILDING THE SERVER 
 
-Building the collabreate server requires the java SDK (tested with 1.6). For 
+Building the Code Break server requires the java SDK (tested with 1.6). For 
 full functionality you also need a JDBC connector for your databaes (PostgreSQL
 8.3 with "PostgreSQL 8.3 JDBC4 with SSL").  
 (http://jdbc.postgresql.org/download/postgresql-8.3-603.jdbc4.jar)
@@ -71,22 +67,22 @@ Due to the structure of some queries, PostgreSQL 8.2 or higher is required.
 
 Unpack the archive:
 
-#tar -zxf collabreate.tgz
+#tar -zxf codebreak.tgz
 
 The server subdirectory contains all the server components:
 
 Compile the required classes:
 
-#javac collabreate/server/*.java
+#javac codebreak/server/*.java
 
 At this point you can try out the server:
 
-#java collabreate.server.CollabreateServer collabreate/server/server.conf
+#java codebreak.server.CodeBreakServer codebreak/server/server.conf
 
 
 EXECUTABLE JAR FILES
 
-Alternatively, cd into collabreate/server/ and use make:
+Alternatively, cd into codebreak/server/ and use make:
 
 #make all
 
@@ -102,7 +98,7 @@ This installs server files, control files, etc.  To visually inspect the
 install process prior to install, run "make test".  You can now start via
 init.d
 
-#/etc/init.d/collabreate start
+#/etc/init.d/codebreak start
 
 
 CUSTOMIZING VIA YOUR ENVIRONMENT (optional)
@@ -119,36 +115,36 @@ INSTALLDIR  - where to install the server, full path
 MANDIR      - full path to the location of man files
 INITDIR     - path to init.d
 INITBIN     - name of file to place in init.d
-COLLAB_USER - name of user account the server will run as
-COLLAB_GROUP- group account
+CODEBREAK_USER - name of user account the server will run as
+CODEBREAK_GROUP- group account
 
 the provided management scripts also provide similar customization.  If you 
 modified paths at build/install, you may need to make modifications here.
 
 JAVA_HOME   - home directory for java 
-COLLAB_SERVER_DIR - directory the server was installed into
-COLLAB_LOG        - file that the scripts will log to
-COLLAB_SCRIPT     - full path to collabctl
-COLLAB_USER       - user account for collabreate server
-COLLAB_GROUP      = group account
+CODEBREAK_SERVER_DIR - directory the server was installed into
+CODEBREAK_LOG        - file that the scripts will log to
+CODEBREAK_SCRIPT    - FULL Path to collabctl
+CODEBREAK_USER       - user account for codebreak server
+CODEBREAK_GROUP      = group account
 
 DATABASE SETUP
 
 For database functionality there are a few more steps:
 
-A database must be setup for use with collabreate.  
-create a database user and a database (collabDB for example):
+A database must be setup for use with codebreak.  
+create a database user and a database (codebreakDB for example):
 postgres:
-   # createuser -U postgres collab 
+   # createuser -U postgres codebreak 
    Shall the new role be a superuser? (y/n) y
    Shall the new role be allowed to create databases? (y/n) y
    Shall the new role be allowed to create more new roles? (y/n) n
    CREATE ROLE
-   # createdb -U collab collabDB
+   # createdb -U codebreak codebreakDB
    CREATE DATABASE
 
    A sample .sql file is provided to install the schema:
-   # psql -U collab -d collabDB -f dbschema.sql
+   # psql -U codebreak -d codebreakDB -f dbschema.sql
 
 mysql:
    The user account creation is part of the provided sql script
@@ -159,7 +155,7 @@ provide the jar in the classpath on the command line:
 
 (the following two lines should be executed as one line)
 #java -cp "postgresql-8.3-603.jdbc4.jar:." 
-collabreate/server/CollabreateServer server.conf
+codebreak/server/CodeBreakServer server.conf
 
 Alternatively, if you have built jars, you can use the launch_server.sh script.
 
@@ -248,7 +244,8 @@ permissions.
 The default operation of the server is to allow all users and all projects 
 to have full publish and subscribe permissions.
 
-Note: these permissions are applied at the collabREate server and are 
+Note: these permissions are applied at the Code Break server and are 
 independant of the publish and subscribe requests applied by the plugin.
 This allows for creating complex publish and subscribe models to fit almost 
 any scenario.
+
