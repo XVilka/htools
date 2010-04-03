@@ -32,6 +32,6 @@ class server_constants:
     TIMESTAMP   = 4
 
 DB_HOST = 'localhost'
-DB_USER = 'yed'
-DB_PASS = 'heslo'
-DB_NAME = 'ida'
+DB_USER = 'xvilka'
+DB_PASS = 'xvilka'
+DB_NAME = 'multida'

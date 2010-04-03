@@ -87,6 +87,8 @@ class ida_sync(object):
                 record
             LEFT JOIN
                 users ON users.id = record.user_id
+            LEFT JOIN
+                project ON project.id = record.project_id
             WHERE
                 users.username = '%s'
             AND
