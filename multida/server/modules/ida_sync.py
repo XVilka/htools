@@ -358,4 +358,22 @@ class ida_sync(object):
             self.delete_record(index)
 
         # create the last update entry.
-        self.append_record( username=username, project=project, timestamp = long(time.time()))
+        self.append_record(username=username, project=project, timestamp = long(time.time()))
+
+    def delete_record(index):
+        '''
+        deleting record from db
+        '''
+
+        #self.cursor.execute("""
+        #
+        #""" % index
+
+    def append_record(username, project, timestamp):
+        '''
+        appending record to db
+        '''
+
+        self.cursor.execute("""
+        #
+        #""" % username, project, timestamp
