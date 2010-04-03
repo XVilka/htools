@@ -94,7 +94,7 @@ class ida_sync(object):
             AND
                 project.name = '%s'
             ORDER BY
-                id DESC
+                record.id DESC
             LIMIT 1""" % (username, project))
 
         return self.cursor.fetchone()
