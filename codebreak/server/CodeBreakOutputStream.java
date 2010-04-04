@@ -25,100 +25,100 @@ import java.io.*;
 
 /**
  * CodeBreakOutputStream
- * This class wraps a DataOutputStream around a ByteArrayOutputStream for 
+ * This class wraps a DataOutputStream around a ByteArrayOutputStream for
  * convenience in building data packets.
  */
 
 public class CodeBreakOutputStream implements DataOutput {
 
-   private ByteArrayOutputStream baos;
-   private DataOutputStream dos;
+    private ByteArrayOutputStream baos;
+    private DataOutputStream dos;
 
-   /**
-    * CodeBreakOutputStream
-    * This class wraps a DataOutputStream around a ByteArrayOutputStream for 
-    * convenience in building data packets, for those familiar with these classes
-    * the methods should be self explanitory.
-    */
-   public CodeBreakOutputStream() {
-      baos = new ByteArrayOutputStream();
-      dos = new DataOutputStream(baos);
-   }
-   
-   public void write(byte[] b) throws IOException {
-      dos.write(b);
-   }
-   
-   public void write(byte[] b, int off, int len) throws IOException {
-      dos.write(b, off, len);
-   }
-   
-   public void write(int b) throws IOException {
-      dos.write(b);
-   }
-   
-   public void writeBoolean(boolean v) throws IOException {
-      dos.writeBoolean(v);
-   }
-   
-   public void writeByte(int v) throws IOException {
-      dos.writeByte(v);
-   }
-   
-   public void writeBytes(String s) throws IOException {
-      dos.writeBytes(s);
-   }
-   
-   public void writeChar(int v) throws IOException {
-      dos.writeChar(v);
-   }
-   
-   public void writeChars(String s) throws IOException {
-      dos.writeChars(s);
-   }
-   
-   public void writeDouble(double v) throws IOException {
-      dos.writeDouble(v);
-   }
-   
-   public void writeFloat(float v) throws IOException {
-      dos.writeFloat(v);
-   }
-   
-   public void writeInt(int v) throws IOException {
-      dos.writeInt(v);
-   }
-   
-   public void writeLong(long v) throws IOException {
-      dos.writeLong(v);
-   }
-   
-   public void writeShort(int v) throws IOException {
-      dos.writeShort(v);
-   }
-   
-   public void writeTo(OutputStream out) throws IOException {
-      dos.flush();
-      baos.writeTo(out);
-   }
-   
-   public void writeUTF(String s) throws IOException {
-      dos.writeUTF(s);
-   }
-   
-   public byte[] toByteArray() {
-      try {
-         dos.flush();
-      } catch (Exception ex) {
-      }
-      return baos.toByteArray();
-   }
-   
-   public int size() {
-      try {
-         dos.flush();
-      } catch (Exception ex) {
-      }
-      return baos.size();
-   }      
+    /**
+     * CodeBreakOutputStream
+     * This class wraps a DataOutputStream around a ByteArrayOutputStream for
+     * convenience in building data packets, for those familiar with these classes
+     * the methods should be self explanitory.
+     */
+    public CodeBreakOutputStream() {
+        baos = new ByteArrayOutputStream();
+        dos = new DataOutputStream(baos);
+    }
+
+    public void write(byte[] b) throws IOException {
+        dos.write(b);
+    }
+
+    public void write(byte[] b, int off, int len) throws IOException {
+        dos.write(b, off, len);
+    }
+
+    public void write(int b) throws IOException {
+        dos.write(b);
+    }
+
+    public void writeBoolean(boolean v) throws IOException {
+        dos.writeBoolean(v);
+    }
+
+    public void writeByte(int v) throws IOException {
+        dos.writeByte(v);
+    }
+
+    public void writeBytes(String s) throws IOException {
+        dos.writeBytes(s);
+    }
+
+    public void writeChar(int v) throws IOException {
+        dos.writeChar(v);
+    }
+
+    public void writeChars(String s) throws IOException {
+        dos.writeChars(s);
+    }
+
+    public void writeDouble(double v) throws IOException {
+        dos.writeDouble(v);
+    }
+
+    public void writeFloat(float v) throws IOException {
+        dos.writeFloat(v);
+    }
+
+    public void writeInt(int v) throws IOException {
+        dos.writeInt(v);
+    }
+
+    public void writeLong(long v) throws IOException {
+        dos.writeLong(v);
+    }
+
+    public void writeShort(int v) throws IOException {
+        dos.writeShort(v);
+    }
+
+    public void writeTo(OutputStream out) throws IOException {
+        dos.flush();
+        baos.writeTo(out);
+    }
+
+    public void writeUTF(String s) throws IOException {
+        dos.writeUTF(s);
+    }
+
+    public byte[] toByteArray() {
+        try {
+            dos.flush();
+        } catch (Exception ex) {
+        }
+        return baos.toByteArray();
+    }
+
+    public int size() {
+        try {
+            dos.flush();
+        } catch (Exception ex) {
+        }
+        return baos.size();
+    }
 }

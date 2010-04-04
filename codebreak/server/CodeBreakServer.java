@@ -21,11 +21,16 @@
 
 package codebreak.server;
 
-import java.io.*;
-import java.net.*;
-import java.sql.*;
-import java.util.*;
-import java.security.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.util.Properties;
 
 
 /**
@@ -35,246 +40,252 @@ import java.security.*;
  */
 public class CodeBreakServer extends Thread implements CodeBreakConstants {
 
-   /**
-    * the tcp port to default to if no config is specified
-    */
-   public static final String DEFAULT_PORT = "5042";
+    /**
+     * the tcp port to default to if no config is specified
+     */
+    public static final String DEFAULT_PORT = "5042";
 
-   private ServerSocket ss;
-   private Properties props = new Properties();
-   private ConnectionManagerBase cm;
-   private ManagerHelper mh;
+    private ServerSocket ss;
+    private Properties props = new Properties();
+    private ConnectionManagerBase cm;
+    private ManagerHelper mh;
 
-   private PrintStream logStream = System.err;
+    private PrintStream logStream = System.err;
 
-   private int verbosityLevel = DEFAULT_VERBOSITY;
+    private int verbosityLevel = DEFAULT_VERBOSITY;
 
-   /**
-    * CodeBreakServer Construct a server object that pulls options from a config file 
-    * @param configFile A configuration file to read for options
- * @throws Exception
-    */
-   protected CodeBreakServer(String configFile) throws Exception {
-      try {
-         FileInputStream fis = new FileInputStream(configFile);
-         props.load(fis);
-      } catch (Exception ex) {
-         System.err.println("Failed to load config file: " + configFile);
-         throw ex;
-      }
-      initCommon();
-   }
+    /**
+     * CodeBreakServer Construct a server object that pulls options from a config file
+     *
+     * @param configFile A configuration file to read for options
+     * @throws Exception
+     */
+    protected CodeBreakServer(String configFile) throws Exception {
+        try {
+            FileInputStream fis = new FileInputStream(configFile);
+            props.load(fis);
+        } catch (Exception ex) {
+            System.err.println("Failed to load config file: " + configFile);
+            throw ex;
+        }
+        initCommon();
+    }
 
-   /**
-    * CodeBreakServer Construct a server object that uses default settings
- * @throws Exception
-    */
-   protected CodeBreakServer() throws Exception {
-      initCommon();
-   }
+    /**
+     * CodeBreakServer Construct a server object that uses default settings
+     *
+     * @throws Exception
+     */
+    protected CodeBreakServer() throws Exception {
+        initCommon();
+    }
 
-   /**
-    * logs a message to the configured log file (server.conf)
-    * @param msg the string to log
-    */
-   protected void log(String msg) {
-      log(msg, 0);
-   }
+    /**
+     * logs a message to the configured log file (server.conf)
+     *
+     * @param msg the string to log
+     */
+    protected void log(String msg) {
+        log(msg, 0);
+    }
 
-   /**
-    * logs a message to the configured log file (server.conf)
-    * @param msg the string to log
-    * @param verbosity apply a verbosity level to the msg
-    */
-   protected void log(String msg, int verbosity) {
-      if (verbosity < verbosityLevel) {
-         logStream.print(msg);
-      }
-   }
+    /**
+     * logs a message to the configured log file (server.conf)
+     *
+     * @param msg       the string to log
+     * @param verbosity apply a verbosity level to the msg
+     */
+    protected void log(String msg, int verbosity) {
+        if (verbosity < verbosityLevel) {
+            logStream.print(msg);
+        }
+    }
 
-   /**
-    * logs a message to the configured log file (server.conf) (with newline)
-    * @param msg the string to log
-    */
-   protected void logln(String msg) {
-      logln(msg, 0);
-   }
+    /**
+     * logs a message to the configured log file (server.conf) (with newline)
+     *
+     * @param msg the string to log
+     */
+    protected void logln(String msg) {
+        logln(msg, 0);
+    }
 
-   /**
-    * logs a message to the configured log file (server.conf) (with newline)
-    * @param msg the string to log
-    * @param verbosity apply a verbosity level to the msg
-    */
-   protected void logln(String msg, int verbosity) {
-      if (verbosity < verbosityLevel) {
-         logStream.println(msg);
-      }
-   }
+    /**
+     * logs a message to the configured log file (server.conf) (with newline)
+     *
+     * @param msg       the string to log
+     * @param verbosity apply a verbosity level to the msg
+     */
+    protected void logln(String msg, int verbosity) {
+        if (verbosity < verbosityLevel) {
+            logStream.println(msg);
+        }
+    }
 
-   /**
-    * logs an exception to the configured log file (server.conf) (with newline)
-    * @param ex the exception to log
-    */
-   protected void logex(Exception ex) {
-      logex(ex, 0);
-   }
+    /**
+     * logs an exception to the configured log file (server.conf) (with newline)
+     *
+     * @param ex the exception to log
+     */
+    protected void logex(Exception ex) {
+        logex(ex, 0);
+    }
 
-   /**
-    * logs an exception to the configured log file (server.conf) (with newline)
-    * @param ex the exception to log
-    * @param verbosity apply a verbosity level to the exception 
-    */
-   protected void logex(Exception ex, int verbosity) {
-      if (verbosity < verbosityLevel) {
-         ex.printStackTrace(logStream);
-      }
-   }
+    /**
+     * logs an exception to the configured log file (server.conf) (with newline)
+     *
+     * @param ex        the exception to log
+     * @param verbosity apply a verbosity level to the exception
+     */
+    protected void logex(Exception ex, int verbosity) {
+        if (verbosity < verbosityLevel) {
+            ex.printStackTrace(logStream);
+        }
+    }
 
-   /**
-    * getJDBCConnection sets up and returns a JDBC connection 
-    * @return a JDBC connection
-    */
-   private Connection getJDBCConnection() {
-      Connection con  ;
-      String driver = props.getProperty("JDBC_DRIVER", "org.postgresql.Driver");
-      try {
-         Class.forName(driver);
-      } catch(java.lang.ClassNotFoundException e) {
-         logln("ClassNotFoundException: " + e.getMessage(), LERROR);
-         logln("you need the jdbc jar for " + driver + " in your classpath!\n", LERROR);
-         logln("Current classpath is: ", LERROR);
-         logln(System.getProperty("java.class.path"), LERROR);
-         logex(e);
-         return null;
-      }
+    /**
+     * getJDBCConnection sets up and returns a JDBC connection
+     *
+     * @return a JDBC connection
+     */
+    private Connection getJDBCConnection() {
+        Connection con;
+        String driver = props.getProperty("JDBC_DRIVER", "org.postgresql.Driver");
+        try {
+            Class.forName(driver);
+        } catch (java.lang.ClassNotFoundException e) {
+            logln("ClassNotFoundException: " + e.getMessage(), LERROR);
+            logln("you need the jdbc jar for " + driver + " in your classpath!\n", LERROR);
+            logln("Current classpath is: ", LERROR);
+            logln(System.getProperty("java.class.path"), LERROR);
+            logex(e);
+            return null;
+        }
 
-      try {
-         String userid = props.getProperty("DB_USER", "codebreak");
-         String password = props.getProperty("DB_PASS");
-         if (password == null) {
-            //need to prompt for the password
-         }
-         String url = props.getProperty("JDBC_URL");
-         if (url == null) {
-            String dbname = props.getProperty("DB_NAME", "codebreak");
-            String host = props.getProperty("DB_HOST", "127.0.0.1");
-            String ssl = props.getProperty("USE_SSL", "no");
-            String dbtype = props.getProperty("JDBC_NAME", "postgresql");
-            url = "jdbc:" + dbtype + "://" + host + "/" + dbname;
-            if (ssl.equalsIgnoreCase("yes")) {
-               url += "?ssl";
+        try {
+            String userid = props.getProperty("DB_USER", "codebreak");
+            String password = props.getProperty("DB_PASS");
+            if (password == null) {
+                //need to prompt for the password
             }
-         }
-         con = DriverManager.getConnection(url, userid, password);
-      } catch(SQLException ex) {
-         logln("SQLException: " + ex.getMessage(), LERROR);
-         logln("check permissions in your database configuration file\n", LERROR);
-         return null;
-      }
-      
-      try {
-         DatabaseMetaData meta = con.getMetaData();
-         logln("Connected to " + meta.getURL(), LINFO);
-         log("DB Driver : " + meta.getDriverName(), LINFO3);
-         logln(" v: " + meta.getDriverVersion(), LINFO3);
-         logln("Database: " + meta.getDatabaseProductName() + " "
-                              + meta.getDatabaseMajorVersion() + "." + meta.getDatabaseMinorVersion(), LINFO3);
-         logln("JDBC v: " + meta.getJDBCMajorVersion() + "." + meta.getJDBCMinorVersion(), LINFO3);
-      } catch(Exception ex1) {
-         logln("Couldn't get driver metadata: " + ex1.getMessage());
-         //Is this a fatal error, do you want to close con here?
-      }
-      return con;
-   }
+            String url = props.getProperty("JDBC_URL");
+            if (url == null) {
+                String dbname = props.getProperty("DB_NAME", "codebreak");
+                String host = props.getProperty("DB_HOST", "127.0.0.1");
+                String ssl = props.getProperty("USE_SSL", "no");
+                String dbtype = props.getProperty("JDBC_NAME", "postgresql");
+                url = "jdbc:" + dbtype + "://" + host + "/" + dbname;
+                if (ssl.equalsIgnoreCase("yes")) {
+                    url += "?ssl";
+                }
+            }
+            con = DriverManager.getConnection(url, userid, password);
+        } catch (SQLException ex) {
+            logln("SQLException: " + ex.getMessage(), LERROR);
+            logln("check permissions in your database configuration file\n", LERROR);
+            return null;
+        }
 
-   private void initCommon() throws Exception {
-      int port  = Integer.parseInt(props.getProperty("SERVER_PORT", DEFAULT_PORT));
-      ss = new ServerSocket(port);
+        try {
+            DatabaseMetaData meta = con.getMetaData();
+            logln("Connected to " + meta.getURL(), LINFO);
+            log("DB Driver : " + meta.getDriverName(), LINFO3);
+            logln(" v: " + meta.getDriverVersion(), LINFO3);
+            logln("Database: " + meta.getDatabaseProductName() + " "
+                    + meta.getDatabaseMajorVersion() + "." + meta.getDatabaseMinorVersion(), LINFO3);
+            logln("JDBC v: " + meta.getJDBCMajorVersion() + "." + meta.getJDBCMinorVersion(), LINFO3);
+        } catch (Exception ex1) {
+            logln("Couldn't get driver metadata: " + ex1.getMessage());
+            //Is this a fatal error, do you want to close con here?
+        }
+        return con;
+    }
 
-      String logFile = props.getProperty("LogFile");
-      if (logFile != null) {
-         try {
-            logStream = new PrintStream(new FileOutputStream(logFile, true), true);
-            logln("Logging started to " + logFile + ". (defined in server.conf)");
-         } catch (Exception ex) {
-            ex.printStackTrace();
+    private void initCommon() throws Exception {
+        int port = Integer.parseInt(props.getProperty("SERVER_PORT", DEFAULT_PORT));
+        ss = new ServerSocket(port);
+
+        String logFile = props.getProperty("LogFile");
+        if (logFile != null) {
+            try {
+                logStream = new PrintStream(new FileOutputStream(logFile, true), true);
+                logln("Logging started to " + logFile + ". (defined in server.conf)");
+            } catch (Exception ex) {
+                ex.printStackTrace();
+                logStream = System.err;
+            }
+        } else {
             logStream = System.err;
-         }
-      }
-      else {
-         logStream = System.err;
-         logln("Could not get LogFile from server.conf");
-      }
+            logln("Could not get LogFile from server.conf");
+        }
 
-      String verbosityProp = props.getProperty("LogVerbosity");
-      if (verbosityProp != null) {
-         verbosityLevel = Integer.parseInt(verbosityProp);
-      }
-      logln("Log Verbosity set to " + verbosityLevel);
+        String verbosityProp = props.getProperty("LogVerbosity");
+        if (verbosityProp != null) {
+            verbosityLevel = Integer.parseInt(verbosityProp);
+        }
+        logln("Log Verbosity set to " + verbosityLevel);
 
-      boolean dbMode = props.getProperty("SERVER_MODE", "database").equals("database");
-      if (!dbMode) {
-         cm = new BasicConnectionManager(this, props);
-      }
-      else {
-         Connection con = getJDBCConnection();
-         if (con == null) {
+        boolean dbMode = props.getProperty("SERVER_MODE", "database").equals("database");
+        if (!dbMode) {
             cm = new BasicConnectionManager(this, props);
-         }
-         else {
-            cm = new DatabaseConnectionManager(this, props, con);
-         }
-      }
-      cm.start();
-      mh = new ManagerHelper(cm, props);
-      mh.start();
-   }
+        } else {
+            Connection con = getJDBCConnection();
+            if (con == null) {
+                cm = new BasicConnectionManager(this, props);
+            } else {
+                cm = new DatabaseConnectionManager(this, props, con);
+            }
+        }
+        cm.start();
+        mh = new ManagerHelper(cm, props);
+        mh.start();
+    }
 
-   /**
-    * run is invoked when the thread is kicked off, accepts a new socket.
-    */
+    /**
+     * run is invoked when the thread is kicked off, accepts a new socket.
+     */
 
-   public void run() {
-      try {
-         while (true) {
-            Socket s = ss.accept();
-            cm.add(s);
-         }
-      } catch (Exception ex) {
-         logln("CollabreateServer terminating: " + ex.getMessage());
-      }
-   }
+    public void run() {
+        try {
+            while (true) {
+                Socket s = ss.accept();
+                cm.add(s);
+            }
+        } catch (Exception ex) {
+            logln("CollabreateServer terminating: " + ex.getMessage());
+        }
+    }
 
-   /**
-    * terminate closes open sockets and attempts to 'nicely' terminate related objects
-    */
-   protected void terminate() {
-      try {
-         ss.close();
-         cm.terminate();
-         mh.terminate();
-         System.exit(0);
-      } catch (Exception ex) {
-      }
-   }
+    /**
+     * terminate closes open sockets and attempts to 'nicely' terminate related objects
+     */
+    protected void terminate() {
+        try {
+            ss.close();
+            cm.terminate();
+            mh.terminate();
+            System.exit(0);
+        } catch (Exception ex) {
+        }
+    }
 
-   /**
-    * main the main function does little more tham instantiate a new Collabreate Server
- * @param args
- * @throws Exception
-    */
+    /**
+     * main the main function does little more tham instantiate a new Collabreate Server
+     *
+     * @param args
+     * @throws Exception
+     */
 
-   public static void main(String args[]) throws Exception {
-      CodeBreakServer cs  ;
-      if (args.length == 1) {
-         //user specified a config file
-         cs = new CodeBreakServer(args[0]);
-      }
-      else {
-         cs = new CodeBreakServer();
-      }
-      cs.start();
-   }
+    public static void main(String args[]) throws Exception {
+        CodeBreakServer cs;
+        if (args.length == 1) {
+            //user specified a config file
+            cs = new CodeBreakServer(args[0]);
+        } else {
+            cs = new CodeBreakServer();
+        }
+        cs.start();
+    }
 
 }
 

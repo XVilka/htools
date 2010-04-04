@@ -27,25 +27,25 @@ package codebreak.server;
  */
 
 public class ProjectInfo {
-   public int lpid;
-   public String desc;
-   public int connected;
-   public int parent;
-   public String pdesc;
-   public long snapupdateid;
-   public long pub;
-   public long sub;
-   public int owner;
-   public String hash;
-   public String gpid;
+    public int lpid;
+    public String desc;
+    public int connected;
+    public int parent;
+    public String pdesc;
+    public long snapupdateid;
+    public long pub;
+    public long sub;
+    public int owner;
+    public String hash;
+    public String gpid;
 
-   public ProjectInfo(int localpid, String description, int currentlyconnected) {
-      lpid = localpid;
-      desc = description;
-      connected = currentlyconnected;
-   }
+    public ProjectInfo(int localpid, String description, int currentlyconnected) {
+        lpid = localpid;
+        desc = description;
+        connected = currentlyconnected;
+    }
 
-   public ProjectInfo(int localpid, String description) {
-      this(localpid, description, 0);
-   }
+    public ProjectInfo(int localpid, String description) {
+        this(localpid, description, 0);
+    }
 }
