@@ -107,6 +107,7 @@ public class Utils {
    /**
     * getRandom Return an array of random bytes
     * @param len The number of bytes to return
+ * @return
     */
    protected static byte[] getRandom(int len) {
       byte result[] = new byte[len];
@@ -117,6 +118,7 @@ public class Utils {
    /**
     * tests if the provided string contains digits only
     * @param s string to test
+ * @return
     */
    protected static boolean isNumeric(String s) {
       boolean rval = true;
@@ -136,6 +138,7 @@ public class Utils {
    /**
     * tests if the provided string contains hex characters only
     * @param s string to test
+ * @return
     */
    protected static boolean isHex(String s) {
       boolean rval = true;
@@ -158,8 +161,9 @@ public class Utils {
    /**
     * tests if the provided string contains letters and digits only
     * @param s string to test
+ * @return
     */
-   protected static boolean isAlphaNumeric(String s) {
+   protected static boolean noAlphaNumeric(String s) {
       boolean rval = true;
       if (s == null || s.length() == 0) {
          rval = false;
@@ -171,7 +175,7 @@ public class Utils {
             }
          }
       }
-      return rval;
+      return !rval;
    }
 
 }

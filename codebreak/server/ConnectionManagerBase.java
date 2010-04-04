@@ -46,8 +46,6 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
 
    private boolean done = false;
 
-   private Properties props;
-
    protected static Object pidLock = new Object();
 
    private CodeBreakServer cs;
@@ -56,7 +54,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
 
    public ConnectionManagerBase(CodeBreakServer mcs, Properties p, boolean mode) {
       cs = mcs;
-      props = p;
+      Properties props=p;
       basicMode = mode;
    }
 
@@ -157,7 +155,8 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
    /**
     * authenticate authenticates a user (for use in database mode)
     * bacially this is standard CHAP with HMAC (md5)
-    * @param user the user to authenticate
+    * @param c
+ * @param user the user to authenticate
     * @param challenge the randomly generated challenge send to the plugin
     * @param response the calculated response from the plugin to check 
     * @return the user id of an authenticated user, or INVALID_USER
@@ -215,7 +214,8 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
    }
 
    /**
-    * dumpStats dumps send / receive stats for each connected client 
+    * dumpStats dumps send / receive stats for each connected client
+ * @return
     */
    protected String dumpStats() {
       StringBuffer sb = new StringBuffer();
@@ -265,7 +265,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
                      }
                      else {
                         //send updateid back to the originator
-                        CollabreateOutputStream os = new CollabreateOutputStream();
+                        CodeBreakOutputStream os = new CodeBreakOutputStream();
                         os.writeLong(p.uid);
                         c.send_data(MSG_ACK_UPDATEID, os.toByteArray());
                      }
@@ -309,7 +309,8 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
    protected abstract Vector<ProjectInfo> getProjectList(String phash);
 
    /**
-    * listConnection displays the current connections to the collabREate connection manager 
+    * listConnection displays the current connections to the collabREate connection manager
+ * @return
     */
    protected String listConnections() {
       StringBuffer sb = new StringBuffer();
@@ -401,7 +402,9 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
     * @param c client invoking the snapforkProject
     * @param spid the pid of the project that is being snapshotted
     * @param desc the user provided description for the snapshot
-    * @return the new project id on success, -1 on failure
+    * @param pub
+ * @param sub
+ * @return the new project id on success, -1 on failure
     */
 
    protected abstract int snapforkProject(Client c, int spid, String desc, long pub, long sub);
@@ -435,7 +438,8 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
    /**
     * updateProjectPerms updates the publish and subscribe values in the database, it also iterates
     * across all clients connected the project and updates the effective permissions accordingly
-    * @param pub the publish permissions to set
+    * @param c
+ * @param pub the publish permissions to set
     * @param sub the subscribe permissions to set
     */
    protected abstract void updateProjectPerms(Client c, long pub, long sub);

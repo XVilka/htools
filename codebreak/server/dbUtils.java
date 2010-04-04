@@ -36,7 +36,8 @@ public class dbUtils implements CodeBreakConstants {
 
    /**
     * getJDBCConnection sets up and returns a JDBC connection
-    * @return a JDBC connection
+    * @param sm
+ * @return a JDBC connection
     */
    protected static Connection getJDBCConnection(ServerManager sm) {
       Connection con = null;

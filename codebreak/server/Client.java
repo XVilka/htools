@@ -74,14 +74,12 @@ public class Client extends Thread implements CodeBreakConstants {
 
    private int stats[][] = new int[2][MAX_COMMAND];
    
-   private boolean basicMode = true;
-
    public Client(ConnectionManagerBase mgr, Socket s, boolean basic) throws Exception {
       cm = mgr;
       conn = s;
       dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
       dos = new DataOutputStream(s.getOutputStream());
-      basicMode = basic;
+      boolean basicMode=basic;
       
       logln("New Connection", LINFO);
 
@@ -239,6 +237,7 @@ public class Client extends Thread implements CodeBreakConstants {
    /**
     * post is the function that actually posts updates to clients (if subscribing)
     * @param data the bytearray containing the update to send
+ * @throws Exception
     */
    public void post(byte[] data) throws Exception {
       if (checkPermissions(parseCommand(data), subscribe)) { 
@@ -826,11 +825,12 @@ public class Client extends Thread implements CodeBreakConstants {
    }
 
    /**
-    * dumpStats displace the receive / transmit stats for each command  
+    * dumpStats displace the receive / transmit stats for each command
+ * @return
     */
    protected String dumpStats() {
       StringBuffer sb = new StringBuffer();
-      sb.append("Stats for " + hash + ":" + conn.getInetAddress().getHostAddress() + ":" + conn.getPort() + "\n");
+       sb.append("Stats for ").append(hash).append(":").append(conn.getInetAddress().getHostAddress()).append(":").append(conn.getPort()).append("\n");
       sb.append("command     rx     tx\n");
       for (int i = 0; i < 256; i++) {
          if (stats[0][i] != 0 || stats[1][i] != 0) {
@@ -840,7 +840,7 @@ public class Client extends Thread implements CodeBreakConstants {
             in = in.substring(in.length() - 7);
             String out = "       " + stats[1][i];
             out = out.substring(out.length() - 7);
-            sb.append(c + " " + in + " " + out + "\n");
+             sb.append(c).append(" ").append(in).append(" ").append(out).append("\n");
          }
       }
       return sb.toString();
@@ -850,6 +850,7 @@ public class Client extends Thread implements CodeBreakConstants {
     * checkPermissions checks to see if the current client has permissions to perform an operation
     * @param command the command to check permissions on
     * @param permType the permission types to check (publish/subscribe)
+ * @return
     */
    /* These are grouped into 'collabREate' permissions, just so there are less permissions to manage
     * for example all the segment operations (add, del, start/end change, etc) are grouped into 

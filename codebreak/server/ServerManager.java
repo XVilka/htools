@@ -36,8 +36,6 @@ import java.util.*;
 
 public class ServerManager implements CodeBreakConstants {
 
-   private boolean done = false;
-
    private Properties props;
 
    private Connection con   = null;
@@ -55,8 +53,6 @@ public class ServerManager implements CodeBreakConstants {
 
    private static final String DEFAULT_PORT = "5043";
    private static final String DEFAULT_HOST = "localhost";
-   private int port;
-   private String host;
 
    private DataInputStream dis;
    private DataOutputStream dos;
@@ -243,7 +239,7 @@ public class ServerManager implements CodeBreakConstants {
    protected void terminate() {
       try {
          System.out.println("ServerManager terminating");
-         done = true;
+         boolean done= true;
          closeDB();
          s.close();
       } catch (Exception e) {
@@ -255,8 +251,8 @@ public class ServerManager implements CodeBreakConstants {
     * by default this must be a local connection.
     */
    protected void connectToHelper() {
-      port  = Integer.parseInt(props.getProperty("MANAGE_PORT", DEFAULT_PORT));
-      host = props.getProperty("MANAGE_HOST", DEFAULT_HOST);
+      int port= Integer.parseInt(props.getProperty("MANAGE_PORT", DEFAULT_PORT));
+      String host= props.getProperty("MANAGE_HOST", DEFAULT_HOST);
       if (s != null) {
          try {
             s.close();
@@ -266,7 +262,7 @@ public class ServerManager implements CodeBreakConstants {
       try {
          //s = new Socket("127.0.0.1",port);
          //s = new Socket("localhost",port);
-         s = new Socket(host,port);
+         s = new Socket(host, port);
          dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
          dos = new DataOutputStream(s.getOutputStream());
          System.out.println("Connection to ManagerHelper established. Ready to process commands");
@@ -501,6 +497,7 @@ public class ServerManager implements CodeBreakConstants {
     * importProject imports a project from a binary final
     * @param ifile the filename to import from
     * @param newowner the local uid to be the owner of the new project
+ * @return
     */
    protected int importProject(File ifile, int newowner) {
       int rval = -1;
@@ -822,6 +819,8 @@ public class ServerManager implements CodeBreakConstants {
 
    /**
     * main provides the cli interface for managing codebreak
+ * @param args
+ * @throws Exception
     */
    public static void main(String args[]) throws Exception {
       ServerManager sm = null;
@@ -875,7 +874,7 @@ public class ServerManager implements CodeBreakConstants {
             System.out.println("Note: the password typed in the interface is not masked ");
             System.out.print("Username: ");
             String username = br.readLine();
-            if (!Utils.isAlphaNumeric(username)) {
+            if (Utils.noAlphaNumeric(username)) {
                System.err.println("bad username");
                continue;
             }

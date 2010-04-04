@@ -37,13 +37,11 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
    private static final String DEFAULT_PORT = "5043";
    private static final String DEFAULT_LOCAL = "1";
 
-   private DataInputStream dis;
    private DataOutputStream dos;
    private ServerSocket ss;
    private Properties props = new Properties();
    private ConnectionManagerBase cm;
    private int pidForUpdates;
-   private boolean dbMode;
 
 
    /**
@@ -51,6 +49,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
     * to be read from a properties object p
     * @param connm the connectionManager associated with this ManagerHelper
     * @param p a propertied object (config file)
+ * @throws Exception
     */
    public ManagerHelper(ConnectionManagerBase connm,Properties p) throws Exception {
       cm = connm;
@@ -63,6 +62,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
     * instantiates a new ManagerHelper with default parameters, the ManagerHelper
     * facilitates getting server state information to the ServerManager
     * @param connm the connectionManager associated with this ManagerHelper
+ * @throws Exception
     */
    public ManagerHelper(ConnectionManagerBase connm) throws Exception {
       cm = connm;
@@ -83,7 +83,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
       } catch (Exception e) {
          logln("Could not setup ManagerHelper socket");
       }
-      dbMode = props.getProperty("SERVER_MODE", "database").equals("database");
+      boolean dbMode=props.getProperty("SERVER_MODE", "database").equals("database");
    }
 
    /**
@@ -118,7 +118,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
          while (true) {
             try {
                Socket s = ss.accept();
-               dis = new DataInputStream(new BufferedInputStream(s.getInputStream()));
+               DataInputStream dis=new DataInputStream(new BufferedInputStream(s.getInputStream()));
                dos = new DataOutputStream(s.getOutputStream());
                logln("New Management connection: " + s.getInetAddress().getHostAddress() + ":" + s.getPort(), LINFO);
                while (true) {

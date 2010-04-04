@@ -51,7 +51,8 @@ public class CodeBreakServer extends Thread implements CodeBreakConstants {
 
    /**
     * CodeBreakServer Construct a server object that pulls options from a config file 
-    * @param configFile A configuration file to read for options 
+    * @param configFile A configuration file to read for options
+ * @throws Exception
     */
    protected CodeBreakServer(String configFile) throws Exception {
       try {
@@ -66,6 +67,7 @@ public class CodeBreakServer extends Thread implements CodeBreakConstants {
 
    /**
     * CodeBreakServer Construct a server object that uses default settings
+ * @throws Exception
     */
    protected CodeBreakServer() throws Exception {
       initCommon();
@@ -133,7 +135,7 @@ public class CodeBreakServer extends Thread implements CodeBreakConstants {
     * @return a JDBC connection
     */
    private Connection getJDBCConnection() {
-      Connection con = null;
+      Connection con  ;
       String driver = props.getProperty("JDBC_DRIVER", "org.postgresql.Driver");
       try {
          Class.forName(driver);
@@ -258,10 +260,12 @@ public class CodeBreakServer extends Thread implements CodeBreakConstants {
 
    /**
     * main the main function does little more tham instantiate a new Collabreate Server
+ * @param args
+ * @throws Exception
     */
 
    public static void main(String args[]) throws Exception {
-      CodeBreakServer cs = null;
+      CodeBreakServer cs  ;
       if (args.length == 1) {
          //user specified a config file
          cs = new CodeBreakServer(args[0]);
