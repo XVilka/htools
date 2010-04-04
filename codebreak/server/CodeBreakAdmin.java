@@ -158,7 +158,7 @@ public class CodeBreakAdmin implements CodeBreakConstants {
      * @param sub      the subscribe permission bitmask
      * @return the userid of the added user, -1 on error
      */
-    protected synchronized void addUser(String username, String password, long pub, long sub) {
+    protected synchronized int addUser(String username, String password, long pub, long sub) {
         int rval = -1;
         if (mode == MODE_DB) {
             try {
@@ -186,7 +186,7 @@ public class CodeBreakAdmin implements CodeBreakConstants {
      * @param uid      the userid of the record to apply the other values to
      * @return the userid of the added user, -1 on error
      */
-    protected synchronized void updateUser(String username, String password, long pub, long sub, int uid) {
+    protected synchronized int updateUser(String username, String password, long pub, long sub, int uid) {
         int rval = -1;
         if (mode == MODE_DB) {
             try {
