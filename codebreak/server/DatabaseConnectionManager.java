@@ -92,7 +92,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
                 int uid = rs.getInt(1);
                 String pwhash = rs.getString(2);
                 byte key[] = Utils.toByteArray(pwhash);
-                byte hmac[] = HmacMD5.hmac(challenge, key);
+                byte hmac[] = Crypto.HMAC_MD5(challenge, key);
                 if (response != null && Arrays.equals(response, hmac)) {
                     userid = uid;
                     c.setUserPub(rs.getLong(3));
@@ -280,7 +280,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
                 c.post(data);
             }
             rs.close();
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -290,9 +290,9 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
      * @param pid the local pid of a project to get info on
      * @return a  project info object for the provided pid
      */
-    protected ProjectInfo getProjectInfo(int pid) {
+    protected Projects getProjectInfo(int pid) {
         String projectstring;
-        ProjectInfo pinfo = null;
+        Projects pinfo = null;
 
         try {
             findProjectByPidQuery.setInt(1, pid);
@@ -303,7 +303,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
                 int parent = rs.getInt(6);
                 long snapupdateid = rs.getLong(4);
                 String pdesc = rs.getString(7);
-                pinfo = new ProjectInfo(lpid, desc);
+                pinfo = new Projects(lpid, desc);
                 pinfo.parent = parent;
                 pinfo.pdesc = pdesc;
                 pinfo.snapupdateid = snapupdateid;
@@ -331,9 +331,9 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
      * @param phash the IDA generated hash that is unique among the analysis files
      * @return a vector of project info objects for the provided phash
      */
-    protected Vector<ProjectInfo> getProjectList(String phash) {
+    protected Vector<Projects> getProjectList(String phash) {
         String projectstring;
-        Vector<ProjectInfo> plist = new Vector<ProjectInfo>();
+        Vector<Projects> plist = new Vector<Projects>();
 
         try {
             findProjectsByHashQuery.setString(1, phash);
@@ -344,7 +344,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
                 int parent = rs.getInt(5);
                 long snapupdateid = rs.getLong(6);
                 String pdesc = rs.getString(7);
-                ProjectInfo pinfo = new ProjectInfo(lpid, desc);
+                Projects pinfo = new Projects(lpid, desc);
                 pinfo.parent = parent;
                 pinfo.pdesc = pdesc;
                 pinfo.snapupdateid = snapupdateid;
@@ -539,7 +539,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
                 rval = forkProject(c, lastupdateid, desc, pub, sub);
             }
             rs.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
 
         return rval;
@@ -908,7 +908,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
                 con.close();
                 con = null;
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 

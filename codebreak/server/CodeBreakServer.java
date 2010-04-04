@@ -265,7 +265,7 @@ public class CodeBreakServer extends Thread implements CodeBreakConstants {
             cm.terminate();
             mh.terminate();
             System.exit(0);
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 

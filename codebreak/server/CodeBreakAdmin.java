@@ -33,14 +33,14 @@ import java.util.Properties;
 import java.util.Vector;
 
 /**
- * ServerManager
+ * CodeBreakAdmin
  * This class is responsible for routine server related operations
  */
 
 
-public class ServerManager implements CodeBreakConstants {
+public class CodeBreakAdmin implements CodeBreakConstants {
 
-    private Properties props;
+    private final Properties props;
 
     private Connection con = null;
 
@@ -61,12 +61,12 @@ public class ServerManager implements CodeBreakConstants {
     private DataInputStream dis;
     private DataOutputStream dos;
     private Socket s;
-    private byte[] emptyPayload = new byte[0];
+    private final byte[] emptyPayload = new byte[0];
     private static int mode = MODE_DB;
 
-    private Vector<ProjectInfo> plist;
+    private final Vector<Projects> plist;
 
-    public ServerManager(Properties p) {
+    public CodeBreakAdmin(Properties p) {
         props = p;
         mode = props.getProperty("SERVER_MODE", "database").equals("database") ? MODE_DB : MODE_BASIC;
         if (mode == MODE_DB) {
@@ -81,7 +81,7 @@ public class ServerManager implements CodeBreakConstants {
         } else {
             System.err.println("Starting in BASIC mode");
         }
-        plist = new Vector<ProjectInfo>();
+        plist = new Vector<Projects>();
         connectToHelper();
     }
 
@@ -89,10 +89,10 @@ public class ServerManager implements CodeBreakConstants {
         useMysql = val;
     }
 
-    private Connection getJDBCConnection(ServerManager sm) {
+    private Connection getJDBCConnection(CodeBreakAdmin sm) {
         Connection c = null;
         if (mode == MODE_DB) {
-            c = dbUtils.getJDBCConnection(sm);
+            c = DB_Interface.getJDBCConnection(sm);
         } else {
             System.err.println("it appears that the server is configured for BASIC mode");
         }
@@ -111,7 +111,7 @@ public class ServerManager implements CodeBreakConstants {
     private int runInsertInt(PreparedStatement s) {
         int rval = -1;
         if (mode == MODE_DB) {
-            rval = dbUtils.runInsertInt(s);
+            rval = DB_Interface.runInsertInt(s);
         } else {
             System.err.println("it appears that the server is configured for BASIC mode");
         }
@@ -121,7 +121,7 @@ public class ServerManager implements CodeBreakConstants {
     private long runInsertLong(PreparedStatement s) {
         long rval = -1;
         if (mode == MODE_DB) {
-            rval = dbUtils.runInsertLong(s);
+            rval = DB_Interface.runInsertLong(s);
         } else {
             System.err.println("it appears that the server is configured for BASIC mode");
         }
@@ -158,7 +158,7 @@ public class ServerManager implements CodeBreakConstants {
      * @param sub      the subscribe permission bitmask
      * @return the userid of the added user, -1 on error
      */
-    protected synchronized int addUser(String username, String password, long pub, long sub) {
+    protected synchronized void addUser(String username, String password, long pub, long sub) {
         int rval = -1;
         if (mode == MODE_DB) {
             try {
@@ -186,7 +186,7 @@ public class ServerManager implements CodeBreakConstants {
      * @param uid      the userid of the record to apply the other values to
      * @return the userid of the added user, -1 on error
      */
-    protected synchronized int updateUser(String username, String password, long pub, long sub, int uid) {
+    protected synchronized void updateUser(String username, String password, long pub, long sub, int uid) {
         int rval = -1;
         if (mode == MODE_DB) {
             try {
@@ -240,7 +240,7 @@ public class ServerManager implements CodeBreakConstants {
             boolean done = true;
             closeDB();
             s.close();
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -254,7 +254,7 @@ public class ServerManager implements CodeBreakConstants {
         if (s != null) {
             try {
                 s.close();
-            } catch (Exception ex) {
+            } catch (Exception ignored) {
             }
         }
         try {
@@ -318,7 +318,7 @@ public class ServerManager implements CodeBreakConstants {
             } else {
                 System.err.println("post should be used for command " + command + ", not send_data.  Data not sent.");
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -383,11 +383,11 @@ public class ServerManager implements CodeBreakConstants {
      * @param pinfo a project info object to populate with information
      * @return 0 on success
      */
-    protected int getProjectInfo(int lpid, ProjectInfo pinfo) {
+    protected int getProjectInfo(int lpid, Projects pinfo) {
         int rval = -1;
         try {
             if (plist != null) {
-                for (ProjectInfo pi : plist) {
+                for (Projects pi : plist) {
                     if (pi.lpid == lpid) {
                         pinfo.lpid = pi.lpid;
                         pinfo.desc = pi.desc;
@@ -421,7 +421,7 @@ public class ServerManager implements CodeBreakConstants {
         int rval = -1;
         if (mode == MODE_DB) {
             try {
-                ProjectInfo pi = new ProjectInfo(1, "none");
+                Projects pi = new Projects(1, "none");
                 if (getProjectInfo(lpid, pi) == 0) {
                     if (pi.snapupdateid > 0) {
                         System.err.println("snapshot exporting is currently not implimented");
@@ -432,7 +432,7 @@ public class ServerManager implements CodeBreakConstants {
                         System.err.println("This project was forked.  Note: lineage is not preserved with export.");
                     }
                     FileOutputStream fos = new FileOutputStream(efile);
-                    CodeBreakOutputStream os = new CodeBreakOutputStream();
+                    Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
 
                     os.writeBytes(FILE_SIG);
                     os.writeInt(FILE_VER);
@@ -502,7 +502,7 @@ public class ServerManager implements CodeBreakConstants {
         int rval = -1;
         if (mode == MODE_DB) {
             try {
-                ProjectInfo pi = new ProjectInfo(1, "none");
+                Projects pi = new Projects(1, "none");
                 FileInputStream fis = new FileInputStream(ifile);
 
                 DataInputStream fdis;
@@ -531,7 +531,7 @@ public class ServerManager implements CodeBreakConstants {
                 System.out.println("desc: " + desc);
 
                 //addproject
-                CodeBreakOutputStream os = new CodeBreakOutputStream();
+                Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
                 os.writeInt(newowner);
                 os.write(gpid);
                 os.write(hash);
@@ -578,7 +578,7 @@ public class ServerManager implements CodeBreakConstants {
                     System.out.print(".");
 
                     //insertUpdate
-                    CodeBreakOutputStream cos = new CodeBreakOutputStream();
+                    Utils.CodeBreakOutputStream cos = new Utils.CodeBreakOutputStream();
                     cos.writeInt(newowner);  //this is required becuase the original uid may
                     //os.writeInt(uid);      //not be present on the new server (users aren't migrated yet)
                     //cos.writeInt(newpid);  //similary, we could specify the newly created project
@@ -702,7 +702,7 @@ public class ServerManager implements CodeBreakConstants {
                     }
                     String isSnap = (rs.getLong(9) > 0) ? " X " : "   ";
                     System.out.println(String.format("%-4d %-4d %-4s %-10x %-10x %s %s", rs.getInt(1), rs.getInt(6), isSnap, rs.getLong(4), rs.getLong(5), getPermRowString(rs.getLong(4), rs.getLong(5), 6), rs.getString(7)));
-                    ProjectInfo temppi = new ProjectInfo(rs.getInt(1), rs.getString(7));
+                    Projects temppi = new Projects(rs.getInt(1), rs.getString(7));
                     temppi.parent = rs.getInt(6);
                     temppi.pdesc = rs.getString(8);
                     temppi.snapupdateid = rs.getLong(9);
@@ -742,7 +742,7 @@ public class ServerManager implements CodeBreakConstants {
                     con.close();
                     con = null;
                 }
-            } catch (Exception e) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -763,7 +763,7 @@ public class ServerManager implements CodeBreakConstants {
             if ("yes".equals(input)) {
                 return true;
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
         }
         return false;
     }
@@ -791,7 +791,7 @@ public class ServerManager implements CodeBreakConstants {
         String fp = "";
         String fs = "";
         try {
-            for (int i = 0; i < permStrings.length; i++) {
+            for (String permString : permStrings) {
                 if ((p & 1) == 1) {
                     fp = "P";
                 } else {
@@ -819,13 +819,13 @@ public class ServerManager implements CodeBreakConstants {
      * @throws Exception
      */
     public static void main(String args[]) throws Exception {
-        ServerManager sm = null;
+        CodeBreakAdmin sm = null;
         System.out.println("Got " + args.length + " args");
         if (args.length >= 1) {
             //user specified a config file
             Properties p = new Properties();
             p.load(new FileInputStream(args[0]));
-            sm = new ServerManager(p);
+            sm = new CodeBreakAdmin(p);
         } else {
             System.err.println("Could not read config file!");
             //not enough args
@@ -889,8 +889,8 @@ public class ServerManager implements CodeBreakConstants {
                 System.out.print("Publish permission bitfield (default: 0x" + Long.toHexString(default_pub) + "): ");
                 long pub = parsePerms(br.readLine(), default_pub);
 
-                System.out.print("" + username + " " + pass1 + " " + Utils.getMD5(pass1) + " " + pub + " " + sub);
-                sm.addUser(username, Utils.getMD5(pass1), pub, sub);
+                System.out.print("" + username + " " + pass1 + " " + Crypto.HASH_MD5(pass1) + " " + pub + " " + sub);
+                sm.addUser(username, Crypto.HASH_MD5(pass1), pub, sub);
             } else if ("2".equals(resp)) {
                 if (getMode() != MODE_DB) {
                     System.out.println("this only makes sense in DB MODE !");
@@ -955,7 +955,7 @@ public class ServerManager implements CodeBreakConstants {
                         if (!pass1.equals(pass2)) {
                             System.err.println("passwords didn't match, not changing password ");
                         } else {
-                            password = Utils.getMD5(pass1);
+                            password = Crypto.HASH_MD5(pass1);
                         }
                     }
                     System.out.print("Would you like to change the permissions? ");

@@ -90,7 +90,7 @@ public class Client extends Thread implements CodeBreakConstants {
             send_data(MSG_INITIAL_CHALLENGE, challenge);
         } else {
             //these are used only for the 'auto auth' in BASIC mode
-            CodeBreakOutputStream authos = new CodeBreakOutputStream();
+            Utils.CodeBreakOutputStream authos = new Utils.CodeBreakOutputStream();
             logln("sending AUTH_CONNECTED");
             cm.authenticate(this, null, null, null);
             authenticated = true;
@@ -121,7 +121,7 @@ public class Client extends Thread implements CodeBreakConstants {
         String user = "";
         try {
             clientIP = conn.getInetAddress().getHostAddress() + ":" + conn.getPort();
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
         if (username != null) {
             user = " (" + username + ":" + uid + ")";
@@ -307,7 +307,7 @@ public class Client extends Thread implements CodeBreakConstants {
      */
     protected void sendForkFollow(String fuser, String gpid, long lastupdateid, String desc) {
         try {
-            CodeBreakOutputStream cos = new CodeBreakOutputStream();
+            Utils.CodeBreakOutputStream cos = new Utils.CodeBreakOutputStream();
             logln("Sending forkfollow for " + gpid + " initiated by " + fuser + " at updateid " + lastupdateid, LINFO2);
             cos.writeUTF(fuser);
             cos.write(Utils.toByteArray(gpid));
@@ -322,7 +322,7 @@ public class Client extends Thread implements CodeBreakConstants {
     protected void send_error_msg(String theerror, int type) {
         try {
             logln("Protocol error detected: " + theerror, LERROR);
-            CodeBreakOutputStream os = new CodeBreakOutputStream();
+            Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
             os.writeUTF(theerror);
             byte[] theerrorba = os.toByteArray();
             dos.writeInt(8 + theerrorba.length);
@@ -383,7 +383,7 @@ public class Client extends Thread implements CodeBreakConstants {
         try {
             main_loop:
             while (true) {
-                CodeBreakOutputStream os = new CodeBreakOutputStream();
+                Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
                 int len = dis.readInt();
                 int command = dis.readInt();
                 logln("received data len: " + len + ", cmd: " + command, LDEBUG);
@@ -662,12 +662,12 @@ public class Client extends Thread implements CodeBreakConstants {
                                 }
                                 hash = Utils.toHexString(md5);
                                 logln("project hash: " + hash, LINFO4);
-                                Vector<ProjectInfo> plist = cm.getProjectList(hash);
+                                Vector<Projects> plist = cm.getProjectList(hash);
                                 int nump = plist.size();
                                 os.writeInt(nump);   //send number of elements to come
                                 logln(" Found  " + nump + " projects", LINFO3);
                                 //create list of projects
-                                for (ProjectInfo pi : plist) {
+                                for (Projects pi : plist) {
                                     log(" " + pi.lpid + " " + pi.desc, LINFO4);
                                     os.writeInt(pi.lpid);
                                     os.writeLong(pi.snapupdateid);
@@ -693,8 +693,8 @@ public class Client extends Thread implements CodeBreakConstants {
                                 }
                                 //also append list of permissions supported by this server
                                 os.writeInt(permStrings.length);
-                                for (int i = 0; i < permStrings.length; i++) {
-                                    os.writeUTF(permStrings[i]);
+                                for (String permString : permStrings) {
+                                    os.writeUTF(permString);
                                 }
 
                                 send_data(MSG_PROJECT_LIST, os.toByteArray());
@@ -723,7 +723,7 @@ public class Client extends Thread implements CodeBreakConstants {
 
                             rpublish = tpub;
                             rsubscribe = tsub;
-                            ProjectInfo pi = cm.getProjectInfo(pid);
+                            Projects pi = cm.getProjectInfo(pid);
                             logln("effective publish  : " +
                                     Long.toHexString(pi.pub) + " & " +
                                     Long.toHexString(rpublish) + " & " +
@@ -756,13 +756,13 @@ public class Client extends Thread implements CodeBreakConstants {
                             os.writeLong(rpublish);
                             os.writeLong(rsubscribe);
                             //send the max possible values for requested permissions (mask)
-                            ProjectInfo pi = cm.getProjectInfo(pid);
+                            Projects pi = cm.getProjectInfo(pid);
                             os.writeLong(pi.pub & upublish);
                             os.writeLong(pi.sub & usubscribe);
                             //also append list of permissions supported by this server
                             os.writeInt(permStrings.length);
-                            for (int i = 0; i < permStrings.length; i++) {
-                                os.writeUTF(permStrings[i]);
+                            for (String permString : permStrings) {
+                                os.writeUTF(permString);
                             }
                             send_data(MSG_GET_REQ_PERMS_REPLY, os.toByteArray());
                             break;
@@ -774,7 +774,7 @@ public class Client extends Thread implements CodeBreakConstants {
                                 send_error("Authenication required for this operation");
                                 break;
                             }
-                            ProjectInfo pi = cm.getProjectInfo(pid);
+                            Projects pi = cm.getProjectInfo(pid);
                             if (uid == pi.owner) {
                                 //send the two project permissions
                                 os.writeLong(pi.pub);
@@ -784,8 +784,8 @@ public class Client extends Thread implements CodeBreakConstants {
                                 os.writeLong(FULL_PERMISSIONS);
                                 //also appent list of permissions supported by this server
                                 os.writeInt(permStrings.length);
-                                for (int i = 0; i < permStrings.length; i++) {
-                                    os.writeUTF(permStrings[i]);
+                                for (String permString : permStrings) {
+                                    os.writeUTF(permString);
                                 }
                                 send_data(MSG_GET_PROJ_PERMS_REPLY, os.toByteArray());
                             } else {
@@ -802,7 +802,7 @@ public class Client extends Thread implements CodeBreakConstants {
                                 send_error("Authenication required for this operation");
                                 break;
                             }
-                            ProjectInfo pi = cm.getProjectInfo(pid);
+                            Projects pi = cm.getProjectInfo(pid);
                             if (uid == pi.owner) {
                                 cm.updateProjectPerms(this, pub, sub);
                             } else {

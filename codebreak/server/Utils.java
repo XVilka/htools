@@ -21,8 +21,7 @@
 
 package codebreak.server;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.io.*;
 import java.security.SecureRandom;
 
 /**
@@ -30,9 +29,9 @@ import java.security.SecureRandom;
  * This class offers various utility functions used by the server
  */
 
-public class Utils {
+class Utils {
 
-    private static SecureRandom srand = new SecureRandom();
+    private static final SecureRandom srand = new SecureRandom();
 
     /**
      * toHexString - generate a hex string representation of the specified
@@ -43,7 +42,7 @@ public class Utils {
      * @param length The number of bytes to represent
      * @return The string representation of the given array
      */
-    protected static String toHexString(byte[] data, int start, int length) {
+    private static String toHexString(byte[] data, int start, int length) {
         String hex = "";
         int end = start + length;
         for (int i = start; i < end; i++) {
@@ -60,7 +59,7 @@ public class Utils {
      * @param data The array to be converted
      * @return The string representation of the given array
      */
-    protected static String toHexString(byte[] data) {
+    static String toHexString(byte[] data) {
         return toHexString(data, 0, data.length);
     }
 
@@ -71,7 +70,7 @@ public class Utils {
      * @param hexString The string to convert
      * @return The byte array representation of the given string
      */
-    protected static byte[] toByteArray(String hexString) {
+    static byte[] toByteArray(String hexString) {
         if ((hexString.length() % 2) == 1) {
             //invalid hex string
             return null;
@@ -91,32 +90,12 @@ public class Utils {
     }
 
     /**
-     * getMD5 - calculate the md5sum of a string
-     *
-     * @param tohash The string to hash
-     * @return The md5sum of the input string
-     */
-    protected static String getMD5(String tohash) {
-        byte[] defaultBytes = tohash.getBytes();
-        String hashString = "";
-        try {
-            MessageDigest md5 = MessageDigest.getInstance("MD5");
-            md5.reset();
-            md5.update(defaultBytes);
-            byte hash[] = md5.digest();
-            hashString = Utils.toHexString(hash);
-        } catch (NoSuchAlgorithmException nsae) {
-        }
-        return hashString;
-    }
-
-    /**
      * getRandom Return an array of random bytes
      *
      * @param len The number of bytes to return
      * @return
      */
-    protected static byte[] getRandom(int len) {
+    static byte[] getRandom(int len) {
         byte result[] = new byte[len];
         srand.nextBytes(result);
         return result;
@@ -128,7 +107,7 @@ public class Utils {
      * @param s string to test
      * @return
      */
-    protected static boolean isNumeric(String s) {
+    static boolean isNumeric(String s) {
         boolean rval = true;
         if (s == null || s.length() == 0) {
             rval = false;
@@ -148,7 +127,7 @@ public class Utils {
      * @param s string to test
      * @return
      */
-    protected static boolean isHex(String s) {
+    static boolean isHex(String s) {
         boolean rval = true;
         if (s == null || s.length() == 0) {
             rval = false;
@@ -171,7 +150,7 @@ public class Utils {
      * @param s string to test
      * @return
      */
-    protected static boolean noAlphaNumeric(String s) {
+    static boolean noAlphaNumeric(String s) {
         boolean rval = true;
         if (s == null || s.length() == 0) {
             rval = false;
@@ -185,5 +164,186 @@ public class Utils {
         return !rval;
     }
 
+    /**
+     * makeLink creates a formated HTML link
+     *
+     * @param url  the URL (with params if needed)
+     * @param text the text displayed to the user
+     * @return a wrapped string
+     */
+    protected static String makeLink(String url, String text) {
+        return String.format("<a href=\"%s\">%s</a>", url, text);
+    }
+
+    /**
+     * makeTableData simply wraps a string with td tags
+     *
+     * @param s the string to wrap
+     * @param a alignment (optional: left, center, right. default: left)
+     * @return a wrapped string
+     */
+    private static String makeTableData(String s, String a) {
+        return String.format("<td align='%s'>%s</td>", a, s);
+    }
+
+    protected static String makeTableData(String s) {
+        return makeTableData(s, "left");
+    }
+
+    /**
+     * makeTableRow simply wraps a string with tr tags
+     *
+     * @param s the string to wrap
+     * @return a wrapped string
+     */
+    protected static String makeTableRow(String s) {
+        return String.format("\n<tr>%s</tr>", s);
+    }
+
+    /**
+     * makeFormItem makes a http form item
+     *
+     * @param name  the name of the form item
+     * @param type  the type of the form item (text, button, radio, checkbox, password)
+     * @param size  the size to display (only on text/pass)
+     * @param maxl  the maxlen (only on text/pass)
+     * @param value the value for the item
+     * @param check non-zero if checked (only on checkbox / radio)
+     * @param reado non-zero if the item is readonly
+     * @return a string with the formatted form item
+     */
+    protected static String makeFormItem(String name, String type, int size, int maxl, String value, int check, int reado) {
+        String rval = "";
+        int canBchecked = 0;
+        int canBreadonly = 0;
+        if (type.equalsIgnoreCase("text")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" size=\"%s\" maxlength=\"%s\" value=\"%s\"", name, type, size, maxl, value);
+            canBreadonly = 1;
+        } else if (type.equalsIgnoreCase("password")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" size=\"%s\" maxlength=\"%s\" value=\"%s\"", name, type, size, maxl, value);
+            canBreadonly = 1;
+        } else if (type.equalsIgnoreCase("button")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" value=\"%s\"", name, type, value);
+        } else if (type.equalsIgnoreCase("radio")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" value=\"%s\"", name, type, value);
+            canBchecked = 1;
+        } else if (type.equalsIgnoreCase("checkbox")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" value=\"%s\"", name, type, value);
+            canBreadonly = 1;
+            canBchecked = 1;
+        } else if (type.equalsIgnoreCase("submit")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" value=\"%s\"", name, type, value);
+        } else if (type.equalsIgnoreCase("hidden")) {
+            rval = String.format("<input name=\"%s\" type=\"%s\" value=\"%s\"", name, type, value);
+        }
+        if (check != 0 && canBchecked != 0) {
+            rval = rval + " checked";
+        }
+        if (reado != 0 && canBreadonly != 0) {
+            rval = rval + " readonly";
+        }
+        rval = rval + ">";
+        return rval;
+    }
+
+    /**
+     * CodeBreakOutputStream
+     * This class wraps a DataOutputStream around a ByteArrayOutputStream for
+     * convenience in building data packets.
+     */
+
+    public static class CodeBreakOutputStream implements DataOutput {
+
+        private final ByteArrayOutputStream baos;
+        private final DataOutputStream dos;
+
+        /**
+         * CodeBreakOutputStream
+         * This class wraps a DataOutputStream around a ByteArrayOutputStream for
+         * convenience in building data packets, for those familiar with these classes
+         * the methods should be self explanitory.
+         */
+        public CodeBreakOutputStream() {
+            baos = new ByteArrayOutputStream();
+            dos = new DataOutputStream(baos);
+        }
+
+        public void write(byte[] b) throws IOException {
+            dos.write(b);
+        }
+
+        public void write(byte[] b, int off, int len) throws IOException {
+            dos.write(b, off, len);
+        }
+
+        public void write(int b) throws IOException {
+            dos.write(b);
+        }
+
+        public void writeBoolean(boolean v) throws IOException {
+            dos.writeBoolean(v);
+        }
+
+        public void writeByte(int v) throws IOException {
+            dos.writeByte(v);
+        }
+
+        public void writeBytes(String s) throws IOException {
+            dos.writeBytes(s);
+        }
+
+        public void writeChar(int v) throws IOException {
+            dos.writeChar(v);
+        }
+
+        public void writeChars(String s) throws IOException {
+            dos.writeChars(s);
+        }
+
+        public void writeDouble(double v) throws IOException {
+            dos.writeDouble(v);
+        }
+
+        public void writeFloat(float v) throws IOException {
+            dos.writeFloat(v);
+        }
+
+        public void writeInt(int v) throws IOException {
+            dos.writeInt(v);
+        }
+
+        public void writeLong(long v) throws IOException {
+            dos.writeLong(v);
+        }
+
+        public void writeShort(int v) throws IOException {
+            dos.writeShort(v);
+        }
+
+        public void writeTo(OutputStream out) throws IOException {
+            dos.flush();
+            baos.writeTo(out);
+        }
+
+        public void writeUTF(String s) throws IOException {
+            dos.writeUTF(s);
+        }
+
+        public byte[] toByteArray() {
+            try {
+                dos.flush();
+            } catch (Exception ignored) {
+            }
+            return baos.toByteArray();
+        }
+
+        public int size() {
+            try {
+                dos.flush();
+            } catch (Exception ignored) {
+            }
+            return baos.size();
+        }
+    }
 }
 

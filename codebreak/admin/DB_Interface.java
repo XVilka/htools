@@ -1,5 +1,5 @@
 /*
-    Code Break Utils
+    Code Break DataBase Interface
     Copyright (C) 2008 Chris Eagle <cseagle at gmail d0t com>
     Copyright (C) 2008 Tim Vidas <tvidas at gmail d0t com>
     Copyright (C) 2010 XVilka <xvilka at gmail d0t com>
@@ -19,18 +19,21 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package codebreak.server;
+package codebreak.admin;
+
+import codebreak.server.CodeBreakAdmin;
+import codebreak.server.CodeBreakConstants;
 
 import java.sql.*;
 import java.util.Properties;
 
 
 /**
- * dbUtils
+ * DB_Interface
  * This class offers various utility functions used by the servlet
  */
 
-public class dbUtils implements CodeBreakConstants {
+class DB_Interface implements CodeBreakConstants {
 
     /**
      * getJDBCConnection sets up and returns a JDBC connection
@@ -38,7 +41,7 @@ public class dbUtils implements CodeBreakConstants {
      * @param sm
      * @return a JDBC connection
      */
-    protected static Connection getJDBCConnection(ServerManager sm) {
+    protected static Connection getJDBCConnection(CodeBreakAdmin sm) {
         Connection con = null;
         Properties props = sm.getProps();
         String driver = props.getProperty("JDBC_DRIVER", "org.postgresql.Driver");
@@ -47,7 +50,7 @@ public class dbUtils implements CodeBreakConstants {
             if (driver.indexOf("mysql") != -1) {
                 sm.setuseMysql(true);
             }
-        } catch (java.lang.ClassNotFoundException e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ClassNotFoundException: " + e.getMessage());
             System.err.println("you need the jdbc jar for " + driver + " in your classpath!\n");
             System.err.println("Current classpath is: ");
@@ -152,4 +155,3 @@ public class dbUtils implements CodeBreakConstants {
 
 
 }
-

@@ -34,7 +34,7 @@ import java.util.Vector;
 
 public class BasicConnectionManager extends ConnectionManagerBase {
 
-    private Hashtable<String, Vector<ProjectInfo>> basicProjects = new Hashtable<String, Vector<ProjectInfo>>();
+    private Hashtable<String, Vector<Projects>> basicProjects = new Hashtable<String, Vector<Projects>>();
     private int basicmodepid = 500;
 
     public BasicConnectionManager(CodeBreakServer mcs, Properties p) {
@@ -103,11 +103,11 @@ public class BasicConnectionManager extends ConnectionManagerBase {
      * @param pid the local pid of a project to get info on
      * @return a  project info object for the provided pid
      */
-    protected ProjectInfo getProjectInfo(int pid) {
+    protected Projects getProjectInfo(int pid) {
         String projectstring;
         for (String key : basicProjects.keySet()) {
-            Vector<ProjectInfo> vpi = basicProjects.get(key);
-            for (ProjectInfo pi : vpi) {
+            Vector<Projects> vpi = basicProjects.get(key);
+            for (Projects pi : vpi) {
                 if (pi.lpid == pid) {
                     pi.connected = (projects.get(pid)).size();
                     return pi;
@@ -125,13 +125,13 @@ public class BasicConnectionManager extends ConnectionManagerBase {
      * @param phash the IDA generated hash that is unique among the analysis files
      * @return a vector of project info objects for the provided phash
      */
-    protected Vector<ProjectInfo> getProjectList(String phash) {
-        Vector<ProjectInfo> plist = new Vector<ProjectInfo>();
+    protected Vector<Projects> getProjectList(String phash) {
+        Vector<Projects> plist = new Vector<Projects>();
         //build a basic mode project list
         if (basicProjects.containsKey(phash)) {
             plist = basicProjects.get(phash);
         }
-        for (ProjectInfo pi : plist) {
+        for (Projects pi : plist) {
             if (projects.containsKey(pi.lpid)) {
                 pi.connected = (projects.get(pi.lpid)).size();
             }
@@ -152,9 +152,9 @@ public class BasicConnectionManager extends ConnectionManagerBase {
         try {
             boolean foundPid = false;
             logln("joining in basic mode");
-            Vector<ProjectInfo> plist = basicProjects.get(c.getHash());
+            Vector<Projects> plist = basicProjects.get(c.getHash());
             if (plist != null) {
-                for (ProjectInfo pi : plist) {
+                for (Projects pi : plist) {
                     if (pi.lpid == lpid) {
                         foundPid = true;
                         c.setGpid(EMPTY_GPID);
@@ -310,12 +310,12 @@ public class BasicConnectionManager extends ConnectionManagerBase {
         logln("incrementing basic mode pid to : " + basicmodepid, LINFO1);
         synchronized (pidLock) {
             lpid = basicmodepid++;
-            Vector<ProjectInfo> vpi = basicProjects.get(hash);
+            Vector<Projects> vpi = basicProjects.get(hash);
             if (vpi == null) {
-                vpi = new Vector<ProjectInfo>();
+                vpi = new Vector<Projects>();
                 basicProjects.put(hash, vpi);
             }
-            ProjectInfo pi = new ProjectInfo(lpid, desc);
+            Projects pi = new Projects(lpid, desc);
             pi.pub = pub;
             pi.sub = sub;
             vpi.add(pi);

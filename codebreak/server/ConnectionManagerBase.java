@@ -184,7 +184,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
             logln("Failed to add new client: " + ex.getMessage(), LERROR);
             try {
                 s.close();
-            } catch (Exception ex2) {
+            } catch (Exception ignored) {
             }
         }
     }
@@ -278,7 +278,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
                                 }
                             } else {
                                 //send updateid back to the originator
-                                CodeBreakOutputStream os = new CodeBreakOutputStream();
+                                Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
                                 os.writeLong(p.uid);
                                 c.send_data(MSG_ACK_UPDATEID, os.toByteArray());
                             }
@@ -289,7 +289,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
                     }
                 }
             }
-        } catch (InterruptedException iex) {
+        } catch (InterruptedException ignored) {
         } catch (Exception ex) {
             logex(ex);
         }
@@ -312,7 +312,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      * @param pid the local pid of a project to get info on
      * @return a  project info object for the provided pid
      */
-    protected abstract ProjectInfo getProjectInfo(int pid);
+    protected abstract Projects getProjectInfo(int pid);
 
     /**
      * getProjectList generates a list of projects on this server, each list (vector) item is
@@ -322,7 +322,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      * @param phash the IDA generated hash that is unique among the analysis files
      * @return a vector of project info objects for the provided phash
      */
-    protected abstract Vector<ProjectInfo> getProjectList(String phash);
+    protected abstract Vector<Projects> getProjectList(String phash);
 
     /**
      * listConnection displays the current connections to the collabREate connection manager

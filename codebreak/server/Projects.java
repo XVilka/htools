@@ -22,11 +22,11 @@
 package codebreak.server;
 
 /**
- * ProjectInfo is a helper classe to represent information pertitent
+ * Projects is a helper classe to represent information pertitent
  * to a single project
  */
 
-public class ProjectInfo {
+public class Projects {
     public int lpid;
     public String desc;
     public int connected;
@@ -39,13 +39,13 @@ public class ProjectInfo {
     public String hash;
     public String gpid;
 
-    public ProjectInfo(int localpid, String description, int currentlyconnected) {
+    private Projects(int localpid, String description, int currentlyconnected) {
         lpid = localpid;
         desc = description;
         connected = currentlyconnected;
     }
 
-    public ProjectInfo(int localpid, String description) {
+    public Projects(int localpid, String description) {
         this(localpid, description, 0);
     }
 }

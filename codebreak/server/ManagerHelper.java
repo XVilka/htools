@@ -33,7 +33,7 @@ import java.util.Properties;
 /**
  * ManagerHelper
  * This class is intented to facilitate getting current status information to
- * the ServerManager class.
+ * the CodeBreakAdmin class.
  */
 
 public class ManagerHelper extends Thread implements CodeBreakConstants {
@@ -44,7 +44,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
     private DataOutputStream dos;
     private ServerSocket ss;
     private Properties props = new Properties();
-    private ConnectionManagerBase cm;
+    private final ConnectionManagerBase cm;
     private int pidForUpdates;
 
 
@@ -65,7 +65,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
 
     /**
      * instantiates a new ManagerHelper with default parameters, the ManagerHelper
-     * facilitates getting server state information to the ServerManager
+     * facilitates getting server state information to the CodeBreakAdmin
      *
      * @param connm the connectionManager associated with this ManagerHelper
      * @throws Exception
@@ -76,7 +76,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
         initCommon();
     }
 
-    private void initCommon() throws Exception {
+    private void initCommon() {
         try {
             int port = Integer.parseInt(props.getProperty("MANAGE_PORT", DEFAULT_PORT));
             int localonly = Integer.parseInt(props.getProperty("MANAGE_LOCAL", DEFAULT_LOCAL));
@@ -92,7 +92,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
     }
 
     /**
-     * send_data constructs the packet and sends it to the ServerManager
+     * send_data constructs the packet and sends it to the CodeBreakAdmin
      *
      * @param command the server command to send
      * @param data    the data relevant to be sent with command
@@ -108,7 +108,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
             } else {
                 logln("post should be used for command " + command + ", not send_data.  Data not sent.", LERROR);
             }
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 
@@ -127,7 +127,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
                     dos = new DataOutputStream(s.getOutputStream());
                     logln("New Management connection: " + s.getInetAddress().getHostAddress() + ":" + s.getPort(), LINFO);
                     while (true) {
-                        CodeBreakOutputStream os = new CodeBreakOutputStream();
+                        Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
                         int len = dis.readInt();
                         int cmd = dis.readInt();
 
@@ -202,7 +202,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
                             }
                             default: {
                                 logln("unkown command", LERROR);
-//The ServerManager has no means of processing this message as it is very much
+//The CodeBreakAdmin has no means of processing this message as it is very much
 //a synchronous protocol: Send Command -> Process Reply.  If we don't recognize
 //their command we can easily drop it, but they are not likely to be looking
 //for our reply
@@ -213,7 +213,6 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
                     }
                 } catch (EOFException e) {
                     logln("Manager connection dropped ", LINFO);
-                    continue;
                 }
             }
         } catch (Exception ex) {
@@ -228,7 +227,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
     protected void terminate() {
         try {
             ss.close();
-        } catch (Exception ex) {
+        } catch (Exception ignored) {
         }
     }
 

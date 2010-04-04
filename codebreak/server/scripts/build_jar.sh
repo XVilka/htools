@@ -22,7 +22,7 @@ echo "Implementation-Version: 0.0.1" >> conf/server_manifest.mf
 echo "Implementation-Vendor: XVilka & Nothize" >> conf/server_manifest.mf
 echo "Implementation-URL: and-developers.com" >> conf/server_manifest.mf
 
-echo "Main-Class: codebreak.server.ServerManager" > conf/manager_manifest.mf
+echo "Main-Class: codebreak.server.CodeBreakAdmin" > conf/manager_manifest.mf
 echo "Class-Path: $MYCP" >> conf/manager_manifest.mf
 echo "Name: codebreak/server/CodeBreakServer/" >> conf/manager_manifest.mf
 echo "Specification-Title: Code Break Server" >> conf/manager_manifest.mf
