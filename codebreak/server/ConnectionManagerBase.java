@@ -73,7 +73,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      * @param msg       the string to log
      * @param verbosity apply a verbosity level to the msg
      */
-    public void log(String msg, int verbosity) {
+    protected void log(String msg, int verbosity) {
         cs.log(msg, verbosity);
     }
 
@@ -111,7 +111,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      * @param ex        the exception to log
      * @param verbosity apply a verbosity level to the exception
      */
-    public void logex(Exception ex, int verbosity) {
+    protected void logex(Exception ex, int verbosity) {
         cs.logex(ex, verbosity);
     }
 
@@ -155,7 +155,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
     /**
      * calls the terminate function of the associated CollabreateServer
      */
-    public synchronized void Shutdown() {
+    protected synchronized void Shutdown() {
         cs.terminate();
     }
 
@@ -198,7 +198,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      * @param cmd      the 'command' that was performed (comment, rename, etc)
      * @param data     the 'data' portion of the command (the comment text, etc)
      */
-    public abstract void migrateUpdate(int newowner, int pid, int cmd, byte[] data);
+    protected abstract void migrateUpdate(int newowner, int pid, int cmd, byte[] data);
 
     /**
      * post both queues a newly received update to be sent to other clients and (if in DB mode)
@@ -230,7 +230,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      *
      * @return
      */
-    public String dumpStats() {
+    protected String dumpStats() {
         StringBuffer sb = new StringBuffer();
         int cnt = 0;
         sb.append("Stats:\n");
@@ -329,7 +329,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      *
      * @return
      */
-    public String listConnections() {
+    protected String listConnections() {
         StringBuffer sb = new StringBuffer();
         int cnt = 0;
         try {
@@ -445,7 +445,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
      * @return the new project id on success, -1 on failure
      */
 
-    public abstract int migrateProject(int owner, String gpid, String hash, String desc, long pub, long sub);
+    protected abstract int migrateProject(int owner, String gpid, String hash, String desc, long pub, long sub);
 
     /**
      * addProject adds a project to the database and reflector (or merely a reflector in non-DB mode)

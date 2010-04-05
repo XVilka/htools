@@ -29,7 +29,7 @@ import java.security.SecureRandom;
  * This class offers various utility functions used by the server
  */
 
-public class Utils {
+class Utils {
 
     private static final SecureRandom srand = new SecureRandom();
 
@@ -59,7 +59,7 @@ public class Utils {
      * @param data The array to be converted
      * @return The string representation of the given array
      */
-    public static String toHexString(byte[] data) {
+    static String toHexString(byte[] data) {
         return toHexString(data, 0, data.length);
     }
 

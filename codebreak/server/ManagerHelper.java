@@ -19,7 +19,7 @@
     Place, Suite 330, Boston, MA 02111-1307 USA
 */
 
-package codebreak.server.modules;
+package codebreak.server;
 
 import java.io.BufferedInputStream;
 import java.io.DataInputStream;
@@ -30,17 +30,13 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
 
-import codebreak.server.CodeBreakConstants;
-import codebreak.server.ConnectionManagerBase;
-import codebreak.server.Utils;
-
 /**
  * ManagerHelper
  * This class is intented to facilitate getting current status information to
  * the CodeBreakAdmin class.
  */
 
-public class ManagerHelper extends Thread implements CodeBreakConstants, ProtocolConstants {
+public class ManagerHelper extends Thread implements CodeBreakConstants {
 
     private static final String DEFAULT_PORT = "5043";
     private static final String DEFAULT_LOCAL = "1";
@@ -228,7 +224,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants, Protoco
     /**
      * closes the socket
      */
-    public void terminate() {
+    protected void terminate() {
         try {
             ss.close();
         } catch (Exception ignored) {
