@@ -90,7 +90,7 @@ public class Client extends Thread implements CodeBreakConstants {
             send_data(MSG_INITIAL_CHALLENGE, challenge);
         } else {
             //these are used only for the 'auto auth' in BASIC mode
-            Utils.CodeBreakOutputStream authos = new Utils.CodeBreakOutputStream();
+            CodeBreakOutputStream authos = new CodeBreakOutputStream();
             logln("sending AUTH_CONNECTED");
             cm.authenticate(this, null, null, null);
             authenticated = true;
@@ -307,7 +307,7 @@ public class Client extends Thread implements CodeBreakConstants {
      */
     protected void sendForkFollow(String fuser, String gpid, long lastupdateid, String desc) {
         try {
-            Utils.CodeBreakOutputStream cos = new Utils.CodeBreakOutputStream();
+            CodeBreakOutputStream cos = new CodeBreakOutputStream();
             logln("Sending forkfollow for " + gpid + " initiated by " + fuser + " at updateid " + lastupdateid, LINFO2);
             cos.writeUTF(fuser);
             cos.write(Utils.toByteArray(gpid));
@@ -322,7 +322,7 @@ public class Client extends Thread implements CodeBreakConstants {
     protected void send_error_msg(String theerror, int type) {
         try {
             logln("Protocol error detected: " + theerror, LERROR);
-            Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
+            CodeBreakOutputStream os = new CodeBreakOutputStream();
             os.writeUTF(theerror);
             byte[] theerrorba = os.toByteArray();
             dos.writeInt(8 + theerrorba.length);
@@ -383,7 +383,7 @@ public class Client extends Thread implements CodeBreakConstants {
         try {
             main_loop:
             while (true) {
-                Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
+                CodeBreakOutputStream os = new CodeBreakOutputStream();
                 int len = dis.readInt();
                 int command = dis.readInt();
                 logln("received data len: " + len + ", cmd: " + command, LDEBUG);

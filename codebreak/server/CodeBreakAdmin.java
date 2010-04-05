@@ -432,7 +432,7 @@ public class CodeBreakAdmin implements CodeBreakConstants {
                         System.err.println("This project was forked.  Note: lineage is not preserved with export.");
                     }
                     FileOutputStream fos = new FileOutputStream(efile);
-                    Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
+                    CodeBreakOutputStream os = new CodeBreakOutputStream();
 
                     os.writeBytes(FILE_SIG);
                     os.writeInt(FILE_VER);
@@ -531,7 +531,7 @@ public class CodeBreakAdmin implements CodeBreakConstants {
                 System.out.println("desc: " + desc);
 
                 //addproject
-                Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
+                CodeBreakOutputStream os = new CodeBreakOutputStream();
                 os.writeInt(newowner);
                 os.write(gpid);
                 os.write(hash);
@@ -578,7 +578,7 @@ public class CodeBreakAdmin implements CodeBreakConstants {
                     System.out.print(".");
 
                     //insertUpdate
-                    Utils.CodeBreakOutputStream cos = new Utils.CodeBreakOutputStream();
+                    CodeBreakOutputStream cos = new CodeBreakOutputStream();
                     cos.writeInt(newowner);  //this is required becuase the original uid may
                     //os.writeInt(uid);      //not be present on the new server (users aren't migrated yet)
                     //cos.writeInt(newpid);  //similary, we could specify the newly created project

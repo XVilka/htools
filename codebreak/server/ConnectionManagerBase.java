@@ -278,7 +278,7 @@ public abstract class ConnectionManagerBase extends Thread implements CodeBreakC
                                 }
                             } else {
                                 //send updateid back to the originator
-                                Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
+                                CodeBreakOutputStream os = new CodeBreakOutputStream();
                                 os.writeLong(p.uid);
                                 c.send_data(MSG_ACK_UPDATEID, os.toByteArray());
                             }

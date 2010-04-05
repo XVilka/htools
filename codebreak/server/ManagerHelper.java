@@ -127,7 +127,7 @@ public class ManagerHelper extends Thread implements CodeBreakConstants {
                     dos = new DataOutputStream(s.getOutputStream());
                     logln("New Management connection: " + s.getInetAddress().getHostAddress() + ":" + s.getPort(), LINFO);
                     while (true) {
-                        Utils.CodeBreakOutputStream os = new Utils.CodeBreakOutputStream();
+                        CodeBreakOutputStream os = new CodeBreakOutputStream();
                         int len = dis.readInt();
                         int cmd = dis.readInt();
 
