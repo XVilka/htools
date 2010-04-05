@@ -29,7 +29,7 @@ import java.security.SecureRandom;
  * This class offers various utility functions used by the server
  */
 
-class Utils {
+public class Utils {
 
     private static final SecureRandom srand = new SecureRandom();
 
@@ -59,7 +59,7 @@ class Utils {
      * @param data The array to be converted
      * @return The string representation of the given array
      */
-    static String toHexString(byte[] data) {
+    public static String toHexString(byte[] data) {
         return toHexString(data, 0, data.length);
     }
 
@@ -70,7 +70,7 @@ class Utils {
      * @param hexString The string to convert
      * @return The byte array representation of the given string
      */
-    static byte[] toByteArray(String hexString) {
+    public static byte[] toByteArray(String hexString) {
         if ((hexString.length() % 2) == 1) {
             //invalid hex string
             return null;
@@ -107,7 +107,7 @@ class Utils {
      * @param s string to test
      * @return
      */
-    static boolean isNumeric(String s) {
+    public static boolean isNumeric(String s) {
         boolean rval = true;
         if (s == null || s.length() == 0) {
             rval = false;
@@ -127,7 +127,7 @@ class Utils {
      * @param s string to test
      * @return
      */
-    static boolean isHex(String s) {
+    public static boolean isHex(String s) {
         boolean rval = true;
         if (s == null || s.length() == 0) {
             rval = false;
@@ -150,7 +150,7 @@ class Utils {
      * @param s string to test
      * @return
      */
-    static boolean noAlphaNumeric(String s) {
+    public static boolean noAlphaNumeric(String s) {
         boolean rval = true;
         if (s == null || s.length() == 0) {
             rval = false;

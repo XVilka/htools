@@ -24,6 +24,8 @@ package codebreak.server;
 import java.sql.*;
 import java.util.Properties;
 
+import codebreak.server.admin.CodeBreakAdmin;
+
 
 /**
  * DB_Interface
@@ -38,15 +40,12 @@ public class DB_Interface implements CodeBreakConstants {
      * @param sm
      * @return a JDBC connection
      */
-    protected static Connection getJDBCConnection(CodeBreakAdmin sm) {
+    public static Connection getJDBCConnection(CodeBreakAdmin sm) {
         Connection con = null;
         Properties props = sm.getProps();
         String driver = props.getProperty("JDBC_DRIVER", "org.postgresql.Driver");
         try {
             Class.forName(driver);
-            if (driver.indexOf("mysql") != -1) {
-                sm.setuseMysql(true);
-            }
         } catch (java.lang.ClassNotFoundException e) {
             System.err.println("ClassNotFoundException: " + e.getMessage());
             System.err.println("you need the jdbc jar for " + driver + " in your classpath!\n");
@@ -103,7 +102,7 @@ public class DB_Interface implements CodeBreakConstants {
      * @param s a prepared statement that provides a return value
      * @return integer return of the insert query
      */
-    protected static int runInsertInt(PreparedStatement s) {
+    public static int runInsertInt(PreparedStatement s) {
         int rval = -1;
         try {
             ResultSet rs = s.executeQuery();
@@ -131,7 +130,7 @@ public class DB_Interface implements CodeBreakConstants {
      * @param s a prepared statement that provides a return value
      * @return long return of the insert query
      */
-    protected static long runInsertLong(PreparedStatement s) {
+    public static long runInsertLong(PreparedStatement s) {
         long rval = -1;
         try {
             ResultSet rs = s.executeQuery();

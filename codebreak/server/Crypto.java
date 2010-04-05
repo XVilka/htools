@@ -30,7 +30,7 @@ import java.security.NoSuchAlgorithmException;
  * of a collabreate server connection, see RFC 2104
  */
 
-class Crypto {
+public class Crypto {
     /**
      * HMAC_MD5 calculates an Hmac MD5 value
      *
@@ -113,7 +113,7 @@ class Crypto {
      * @param tohash The string to hash
      * @return The md5sum of the input string
      */
-    static String HASH_MD5(String tohash) {
+    public static String HASH_MD5(String tohash) {
         byte[] defaultBytes = tohash.getBytes();
         String hashString = "";
         try {

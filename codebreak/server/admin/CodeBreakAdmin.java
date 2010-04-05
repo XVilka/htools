@@ -21,7 +21,7 @@
 
 //JDBC
 
-package codebreak.server;
+package codebreak.server.admin;
 
 import java.io.*;
 import java.net.Socket;
@@ -31,6 +31,13 @@ import java.sql.ResultSet;
 import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.Vector;
+
+import codebreak.server.CodeBreakConstants;
+import codebreak.server.CodeBreakOutputStream;
+import codebreak.server.Crypto;
+import codebreak.server.DB_Interface;
+import codebreak.server.Projects;
+import codebreak.server.Utils;
 
 /**
  * CodeBreakAdmin
@@ -613,7 +620,7 @@ public class CodeBreakAdmin implements CodeBreakConstants {
      *
      * @return a Properites object
      */
-    protected Properties getProps() {
+    public Properties getProps() {
         return props;
     }
 
