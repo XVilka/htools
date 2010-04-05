@@ -1,0 +1,17 @@
+
+Build settings you will probably have to alter
+in VC6 workspace 
+
+Project->settings-> (select debug/release/all configuration)
+
+C/C++ tab -> preprocessor drop down catagory -> additional include directories
+link tab -> output file path
+link tab -> object/library modules -> path to ida.lib
+
+this project was originally built from ./idasdk/plugins/vc src
+
+made some alterations to the code so it would compile under 4.8 api
+thanks to those who forwarded the info.
+
+
+

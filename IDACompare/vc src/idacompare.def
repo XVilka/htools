@@ -1,0 +1,52 @@
+LIBRARY IDA_Compare
+      DESCRIPTION 'IDA Plugin Stub for VB UI'
+      EXPORTS
+		NumFuncs
+		FunctionStart
+		FunctionEnd
+		GetBytes
+		FuncName
+		GetAsm
+		Jump
+		Refresh
+		ScreenEA
+		SelBounds
+		Setname
+		RemvName
+		PatchByte
+		PatchWord
+		DelFunc
+		FuncIndex
+		FuncArgSize
+		FuncColor
+		AddProgramComment
+		AddCodeXRef
+		DelCodeXRef
+		AddDataXRef
+		DelDataXRef
+		MessageUI
+		MakeCode
+		Undefine
+		GetName
+		OriginalByte
+		FilePath
+		RootFileName
+		ProcessState
+		HideEA
+		ShowEA
+		SetComment
+		GetComment
+	 
+
+
+
+
+
+
+
+
+
+
+
+
+
