@@ -119,7 +119,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
      * @param cmd      the 'command' that was performed (comment, rename, etc)
      * @param data     the 'data' portion of the command (the comment text, etc)
      */
-    protected void migrateUpdate(int newowner, int pid, int cmd, byte[] data) {
+    public void migrateUpdate(int newowner, int pid, int cmd, byte[] data) {
         logln("in migrateUpdate", LINFO4);
         long updateid = 0;
         synchronized (queue) {
@@ -743,7 +743,7 @@ public class DatabaseConnectionManager extends ConnectionManagerBase {
      * @return the new project id on success, -1 on failure
      */
 
-    protected int migrateProject(int owner, String gpid, String hash, String desc, long pub, long sub) {
+    public int migrateProject(int owner, String gpid, String hash, String desc, long pub, long sub) {
         logln("in migrateProject ", LDEBUG);
         int lpid = -1;
         try {

@@ -23,7 +23,15 @@
 
 package codebreak.server;
 
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.net.Socket;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -32,13 +40,15 @@ import java.sql.Timestamp;
 import java.util.Properties;
 import java.util.Vector;
 
+import codebreak.server.modules.ProtocolConstants;
+
 /**
  * CodeBreakAdmin
  * This class is responsible for routine server related operations
  */
 
 
-public class CodeBreakAdmin implements CodeBreakConstants {
+public class CodeBreakAdmin implements CodeBreakConstants, ProtocolConstants {
 
     private final Properties props;
 

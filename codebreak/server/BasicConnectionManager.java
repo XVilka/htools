@@ -66,7 +66,7 @@ public class BasicConnectionManager extends ConnectionManagerBase {
      * @param cmd      the 'command' that was performed (comment, rename, etc)
      * @param data     the 'data' portion of the command (the comment text, etc)
      */
-    protected void migrateUpdate(int newowner, int pid, int cmd, byte[] data) {
+    public void migrateUpdate(int newowner, int pid, int cmd, byte[] data) {
     }
 
     /**
@@ -286,7 +286,7 @@ public class BasicConnectionManager extends ConnectionManagerBase {
      * @return the new project id on success, -1 on failure
      */
 
-    protected int migrateProject(int owner, String gpid, String hash, String desc, long pub, long sub) {
+    public int migrateProject(int owner, String gpid, String hash, String desc, long pub, long sub) {
         logln("migrating in BASIC mode doesn't make sense!", LERROR);
         return -1;
     }
