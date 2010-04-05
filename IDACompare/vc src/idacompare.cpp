@@ -193,11 +193,13 @@ char __stdcall OriginalByte(int offset){ return get_original_byte(offset); }
 void __stdcall SetComment(int offset, char* comm){set_cmt(offset,comm,false);}
 
 void __stdcall GetComment(int offset, char* buf){ 
-	char* tmp = get_cmt(offset,false);
+	int cmtc = get_cmt(offset,false, buf, 800);
+/*
 	if(tmp){
 		//MessageBox(0,tmp,"",0);
 		qstrncpy(buf,tmp, 800);
 	}
+*/
  
 }
 
@@ -207,8 +209,8 @@ int __stdcall FilePath(char *buf){
 	int retlen=0;
 	char *str;
 
-	str = get_input_file_path();
-	qstrncpy(buf,str,MAX_PATH);
+	get_input_file_path(buf, MAX_PATH);
+//	qstrncpy(buf,str,MAX_PATH);
 	return strlen(buf);
 }
 
@@ -216,8 +218,8 @@ int __stdcall RootFileName(char *buf){
 	int retlen=0;
 	char *str;
 
-	str = get_root_filename();
-	qstrncpy(buf,str,MAX_PATH);
+	get_root_filename(buf, MAX_PATH);
+	//qstrncpy(buf,str,MAX_PATH);
 	return strlen(buf);
 }
 
