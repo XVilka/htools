@@ -1,0 +1,18 @@
+0.06 -	08.10.04
+	Great speed improvement (thx to dragon)
+0.05 -	05.10.04
+	Bug-fixes (sometimes function did not match)
+	Save/restore func comments
+	XML-structure change (now only 1 root element)
+	Better user-name function recognition
+	Small other changes
+0.04 -	01.10.04
+	Improved GetMaskLen, added save/restore function frame sizes
+0.03 -	30.09.04
+	Added selection bounds, small changes
+0.02 - 	29.09.04
+	English docs
+0.01 -	27.09.04 
+	Initial release
+		
+		

@@ -1,0 +1,108 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<title>Essense</title>
+</head>
+<body>
+<h2>Essense - IDA Plugin</h2>
+
+<ul>
+ <li><a href="#license">License</a>
+  </li>
+ <li><a href="#intro">What is it?</a>
+  </li>
+ <li><a href="#usage">Usage</a>
+  </li>
+ <li><a href="#conclusion">Conclusion</a>
+  </li>
+</ul> 
+
+<p align="left">
+<a name="license"></a>
+<h3>License</h3>
+This plugin and it sources is distributed under GPL. See 
+<a href="gpl.txt">License</a> for details.
+</p>
+
+<p align="left">
+<a name="intro"></a>
+<h3>What is it?</h3>
+Essense is <a href="http://www.idapro.com">IDA Pro</a> 
+(<a href="http://www.idapro.ru">Russian</a>) plugin.
+It's main purpose is to save essense of IDA database to XML-storage.
+It's like <b>Dump database to IDC</b> IDA command, but with some difference:
+essense is function-based (by default, plugin will save only user-modified 
+functions). Next, plugin is like IDA signatures - try to save only 'valuable'
+instruction length, so essense is become position and file independent.<br>
+This can be useful, if you analysed some version of file and now try to 
+load newer version. Or you analyse several files, which use same library/API.
+You can just save selected function from current database to XML-file (essense) 
+and then just find and load them in new database.You will load almost everything:
+<ul>
+<li>Structures used in this function
+ </li>
+<li>Enums used in this function
+ </li>
+<li>Frame of function
+ </li>
+<li>Names, comments, etc...
+ </li>
+</ul>
+Also, you will see a lot of bugs, of coz! :-)
+</p>
+
+<p align="left">
+<a name="usage"></a>
+<h3>Usage</h3>
+You can load the plugin by pressing (by default) "Alt-1". Choose requred action
+(Save or Load).
+Plugin options:
+<ul>
+<li>Start Address - start address for operation
+ </li>
+<li>End Address - end address for operation
+ </li>
+<li>Filename - file name for operation
+ </li>
+<li>Show debug info - show some unuseful info :-)
+ </li>
+<li>Ignore CALL TO<br>
+To recognize function like
+<pre>func_x:<br>call func_y<br>ret<br></pre>
+plugin have to store name of <b>func_y</b> and check it while loading.
+To turn off this option, check this flag. But be ready to edit/delete some
+small functions from XML-file or you have a lot of wrong-recognized functions
+in new database.<br>
+On other side - sometimes you have to run plugin several times to have function
+<b>func_y</b> recognized, before function <b>func_x</b> will be recognized.
+ </li>
+<li>Don't check names of functions - save all functions, not just user-named.<br>
+Be careful - this will grow a lot you XML file!
+ </li>
+<li>All functions - save all functions, detected by IDA.<br>
+Don't check previous flag to save all user-named functions in database<br>
+ </li>
+<li>Don's save/restore structures - do not save any extra info. Recommended for
+standard complex structures, like IRP or something like.
+ </li>
+<li>Force load - by default, if function already have user-name, it will be
+skipped at load stage. To force loading - set this flag.
+ </li>
+</ul>
+</p>
+
+<p align="left">
+<a name="conclusion"></a>
+<h3>Conclusion</h3>
+I want to thank to Ilfak Guilfanov (author of IDA) for IDA itself and for help me to write this plugin!
+</p>
+
+<div align="CENTER">
+<h4>
+SafeGen Software<br>
+<a href="mailto:kab@safegen.com">kab@safegen.com</a>
+</h4>
+</div>
+
+</body>
+</html>
